@@ -513,8 +513,7 @@
     bar.style.strokeDasharray = String(RING_LEN);
     bar.style.strokeDashoffset = String(RING_LEN * (1 - ratio));
     var ring = $('timerRing');
-    ring.className = 'timer-ring' + (leftMs <= state.duration * 1000 * 0.15 ? ' danger' :
-      (leftMs <= state.duration * 1000 * 0.4 ? ' warn' : ''));
+    ring.setAttribute('class', 'timer-ring' + (leftMs <= state.duration * 1000 * 0.15 ? ' danger' : (leftMs <= state.duration * 1000 * 0.4 ? ' warn' : '')));
     $('timeLeft').textContent = String(Math.max(0, Math.ceil(leftMs / 1000)));
   }
 
