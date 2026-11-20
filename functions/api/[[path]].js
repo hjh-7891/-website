@@ -60,11 +60,14 @@ async function writeRounds(env, list) {
   await env.RANK.put(KEY, JSON.stringify(list));
 }
 
-/* 按昵称聚合：最高单局（排序依据）、累计积分、局数、最高连击 */
-function aggregate(rounds) {
+/* 按昵称聚合（可限定难度）：最高单局是排序依据，另带累计积分、局数、最高连击 */
+function aggregate(rounds, level) {
   const map = new Map();
   rounds.forEach((r) => {
-    const name = safeString(r && r.name, MAX_NAME) || '匿名选手';
+    if (!r || LEVELS.indexOf(r.level) < 0) return;
+    if (level && r.level !== level) return;
+    const name = safeString(r.name, MAX_NAME);
+    if (!name) return;
     if (!map.has(name)) {
       map.set(name, { name: name, score: 0, rounds: 0, best: 0, bestCombo: 0 });
     }
@@ -119,8 +122,14 @@ export async function onRequest(context) {
 
     if (path === '/api/rank') {
       if (request.method !== 'GET') return fail('请用 GET 取排行榜', 405);
+      const level = url.searchParams.get('level') || '';
+      if (level && LEVELS.indexOf(level) < 0) return fail('未知难度类型', 400);
       const rounds = await readRounds(env);
-      return ok({ list: aggregate(rounds).slice(0, 20), rounds: rounds.length });
+      return ok({
+        level: level || 'all',
+        list: aggregate(rounds, level).slice(0, 20),
+        rounds: rounds.length
+      });
     }
 
     if (path === '/api/score') {
@@ -133,13 +142,14 @@ export async function onRequest(context) {
         return fail('请求体不是合法 JSON', 400);
       }
 
-      const name = safeString(body && body.name, MAX_NAME) || '匿名选手';
+      const name = safeString(body && body.name, MAX_NAME);
       const level = LEVELS.indexOf(body && body.level) >= 0 ? body.level : '';
       const correct = toInt(body && body.correct, -1);
       const total = toInt(body && body.total, -1);
       const maxCombo = toInt(body && body.maxCombo, -1);
       const score = toInt(body && body.score, -1);
 
+      if (!name) return fail('请填写昵称', 400);
       if (!level) return fail('未知难度类型', 400);
       if (correct < 0 || correct > MAX_COUNT) return fail('答对题数超出范围', 400);
       if (total < correct || total > MAX_COUNT) return fail('总题数不合法', 400);
@@ -162,8 +172,8 @@ export async function onRequest(context) {
       const trimmed = rounds.length > MAX_ROUNDS ? rounds.slice(rounds.length - MAX_ROUNDS) : rounds;
       await writeRounds(env, trimmed);
 
-      const list = aggregate(trimmed).slice(0, 20);
-      return ok({ rank: rankOf(list, name), list: list, saved: true });
+      const list = aggregate(trimmed, level).slice(0, 20);
+      return ok({ rank: rankOf(list, name), level: level, list: list, saved: true });
     }
 
     return fail('接口不存在', 404);

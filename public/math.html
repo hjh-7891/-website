@@ -3,404 +3,517 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>心算挑战 · 云端排行榜</title>
+<title>心算挑战 · 单屏版</title>
 <link rel="icon" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231b2230'/%3E%3Ctext x='16' y='23' font-size='20' font-family='monospace' fill='%23e4572e' text-anchor='middle'%3E%3F%3C/text%3E%3C/svg%3E">
 <style>
   :root{
-    --paper:#faf6ee;
-    --paper-2:#f3ece0;
-    --ink:#1b2230;
-    --ink-2:#4a5464;
-    --ink-3:#8a93a3;
-    --line:#e2d9c8;
-    --accent:#e4572e;
-    --accent-soft:#fbe6dd;
-    --teal:#27756a;
-    --teal-soft:#dcece7;
-    --red:#c1384b;
-    --red-soft:#f6dde1;
-    --white:#fffdf9;
-    --radius:14px;
-    --shadow:0 2px 0 rgba(27,34,48,.05), 0 14px 30px -22px rgba(27,34,48,.35);
+    --paper:#faf6ee;--paper-2:#f3ece0;--ink:#1b2230;--ink-2:#4a5464;--ink-3:#8a93a3;
+    --line:#e2d9c8;--accent:#e4572e;--accent-soft:#fbe6dd;--teal:#27756a;--teal-soft:#dcece7;
+    --red:#c1384b;--red-soft:#f6dde1;--white:#fffdf9;
+    --shadow:0 2px 0 rgba(27,34,48,.05),0 14px 30px -22px rgba(27,34,48,.35);
     --font-ui:"Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
     --font-num:ui-monospace,"Cascadia Mono",Consolas,"Courier New",monospace;
   }
   *{box-sizing:border-box}
   [hidden]{display:none !important}
-  html,body{margin:0;padding:0}
+  html,body{height:100%;margin:0}
   body{
     background:var(--paper);color:var(--ink);font-family:var(--font-ui);
-    -webkit-font-smoothing:antialiased;min-height:100vh;
+    -webkit-font-smoothing:antialiased;overflow:hidden;
   }
   body::before{
-    content:"";position:fixed;inset:0;background-image:radial-gradient(rgba(27,34,48,.05) 1px, transparent 1px);
-    background-size:22px 22px;pointer-events:none;z-index:0;
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:radial-gradient(rgba(27,34,48,.05) 1px,transparent 1px);
+    background-size:22px 22px;
   }
-  .app{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:20px 16px 40px}
 
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 2px 18px}
-  .brand{display:flex;align-items:center;gap:10px;min-width:0}
+  .app{
+    position:relative;z-index:1;height:100vh;height:100dvh;max-width:820px;margin:0 auto;
+    padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px;
+  }
+
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:0 0 auto}
+  .who{display:flex;align-items:center;gap:8px;min-width:0}
   .mark{
-    width:38px;height:38px;border-radius:10px;background:var(--ink);color:var(--white);
-    display:grid;place-items:center;font-family:var(--font-num);font-size:19px;font-weight:600;flex:0 0 auto;
+    width:34px;height:34px;border-radius:9px;background:var(--ink);color:#fff;
+    display:grid;place-items:center;font-family:var(--font-num);font-size:17px;font-weight:700;flex:0 0 auto;
   }
-  .brand-text{display:flex;flex-direction:column;gap:2px;min-width:0}
-  .brand-text b{font-size:15px;letter-spacing:.5px;font-weight:700}
-  .brand-text span{font-size:12px;color:var(--ink-3)}
-  .chips{display:flex;gap:8px;flex:0 0 auto}
-  .rule-chip{
-    font-size:12px;color:var(--ink-2);background:var(--white);border:1px solid var(--line);
-    padding:7px 11px;border-radius:999px;white-space:nowrap;
+  .who-text{min-width:0}
+  .who-text b{display:block;font-size:13.5px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:32vw}
+  .who-text span{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.35}
+  .bar-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+  .mini-btn{
+    appearance:none;cursor:pointer;border:1px solid var(--line);background:var(--white);
+    color:var(--ink-2);font-family:var(--font-ui);font-size:12.5px;font-weight:600;
+    padding:8px 11px;border-radius:9px;min-height:36px;transition:.14s;white-space:nowrap;
   }
-  .rule-chip strong{font-family:var(--font-num);color:var(--accent);font-weight:700}
+  .mini-btn:hover{border-color:var(--ink-3);color:var(--ink)}
+  .mini-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .mini-btn.primary:hover{background:#d24c26}
   .mode-chip{
-    font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid var(--line);
-    background:var(--white);color:var(--ink-2);white-space:nowrap;display:flex;align-items:center;gap:5px;
+    font-size:11.5px;color:var(--ink-3);border:1px solid var(--line);background:var(--paper-2);
+    padding:5px 8px;border-radius:999px;white-space:nowrap;
   }
-  .mode-chip::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ink-3)}
   .mode-chip.cloud{background:var(--teal-soft);border-color:rgba(39,117,106,.3);color:var(--teal)}
-  .mode-chip.cloud::before{background:var(--teal)}
-  .mode-chip.local{background:var(--paper-2)}
-  @media (max-width:430px){.rule-chip{display:none}}
+  @media (max-width:420px){.mode-chip{display:none}}
 
-  .card{
-    background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
-    box-shadow:var(--shadow);padding:20px;
+  .board{
+    flex:1 1 auto;min-height:0;background:var(--white);border:1px solid var(--line);
+    border-radius:14px;box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;
   }
-  .card + .card{margin-top:16px}
-  .card-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}
-  .card-head h2{margin:0;font-size:15px;letter-spacing:.3px}
-  .card-head span{font-size:12px;color:var(--ink-3)}
+  .view{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
 
-  .hero h1{margin:0 0 10px;font-size:clamp(27px,7.2vw,44px);line-height:1.18;letter-spacing:-.5px}
+  /* ---------- 开始 ---------- */
+  #viewStart{gap:12px;justify-content:center;max-width:600px;width:100%;margin:0 auto}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+  .chips span{
+    font-size:11.5px;color:var(--ink-2);background:var(--paper-2);border:1px solid var(--line);
+    border-radius:999px;padding:4px 9px;
+  }
+  .hero h1{margin:0 0 6px;font-size:clamp(21px,5.6vw,32px);line-height:1.2;letter-spacing:-.4px}
   .hero h1 em{font-style:normal;color:var(--accent)}
-  .hero p{margin:0;color:var(--ink-2);font-size:14px;line-height:1.75;max-width:54ch}
-
-  .start-grid{display:grid;gap:14px;margin-top:22px}
-  @media (min-width:760px){.start-grid{grid-template-columns:1fr 1.45fr;gap:18px}}
-  .field-label{font-size:13px;color:var(--ink-2);margin:0 0 8px;display:block;font-weight:600}
-  .field-label span{font-weight:400;color:var(--ink-3)}
-  input[type="text"]{
-    width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:10px;
-    background:var(--paper-2);color:var(--ink);font-size:16px;font-family:var(--font-ui);
-    outline:none;transition:border-color .15s, box-shadow .15s, background .15s;
+  .hero p{margin:0;font-size:12.5px;line-height:1.7;color:var(--ink-2)}
+  .setup{display:grid;gap:10px;margin-top:4px}
+  @media (min-width:700px){.setup{grid-template-columns:230px 1fr;gap:14px;align-items:start}}
+  .field{display:flex;flex-direction:column;gap:5px;min-width:0}
+  .field label{font-size:12px;font-weight:600;color:var(--ink-2)}
+  #nameInput{
+    width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;
+    background:var(--paper-2);color:var(--ink);font-size:16px;font-family:var(--font-ui);outline:none;transition:.15s;
   }
-  input[type="text"]:focus{border-color:var(--accent);background:var(--white);box-shadow:0 0 0 3px var(--accent-soft)}
-  input[type="text"]::placeholder{color:var(--ink-3)}
-
-  .levels{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  @media (min-width:760px){.levels{grid-template-columns:repeat(4,1fr)}}
+  #nameInput:focus{border-color:var(--accent);background:var(--white);box-shadow:0 0 0 3px var(--accent-soft)}
+  #nameInput.bad{border-color:var(--red);background:#fff;box-shadow:0 0 0 3px var(--red-soft)}
+  .field-hint{font-size:11px;color:var(--ink-3);line-height:1.5}
+  .field-hint.err{color:var(--red);font-weight:600}
+  .levels{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  @media (min-width:520px){.levels{grid-template-columns:repeat(4,1fr)}}
   .level-btn{
-    appearance:none;cursor:pointer;border:1px solid var(--line);background:var(--paper-2);
-    border-radius:10px;padding:11px 9px;font-family:var(--font-ui);color:var(--ink-2);
-    display:flex;flex-direction:column;gap:3px;align-items:flex-start;transition:.15s;text-align:left;
+    appearance:none;cursor:pointer;border:1px solid var(--line);background:var(--paper-2);border-radius:9px;
+    padding:8px;font-family:var(--font-ui);text-align:left;display:flex;flex-direction:column;gap:2px;transition:.14s;min-width:0;
   }
-  .level-btn b{font-size:14px;color:var(--ink)}
-  .level-btn small{font-size:11px;color:var(--ink-3);line-height:1.5}
-  .level-btn .tag{font-family:var(--font-num);font-size:11px;color:var(--accent)}
+  .level-btn b{font-size:13px;color:var(--ink)}
+  .level-btn small{font-family:var(--font-num);font-size:10px;line-height:1.45;color:var(--ink-3)}
   .level-btn[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 2px rgba(228,87,46,.12)}
-  .level-btn[aria-pressed="true"] b{color:var(--accent)}
-
-  .btn{
-    appearance:none;cursor:pointer;border:0;border-radius:10px;font-family:var(--font-ui);
-    font-size:15px;font-weight:600;padding:14px 20px;min-height:48px;
-    transition:transform .12s, background .15s;
+  .level-btn[aria-pressed="true"] b,.level-btn[aria-pressed="true"] small{color:var(--accent)}
+  .start-btn{
+    appearance:none;cursor:pointer;border:0;border-radius:10px;background:var(--accent);color:#fff;
+    font-family:var(--font-ui);font-size:15px;font-weight:700;padding:13px;min-height:48px;
+    box-shadow:0 10px 22px -14px rgba(228,87,46,.85);transition:.14s;
   }
-  .btn:active{transform:translateY(1px)}
-  .btn-primary{background:var(--accent);color:#fff;box-shadow:0 10px 22px -14px rgba(228,87,46,.8)}
-  .btn-primary:hover{background:#d24c26}
-  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink-2)}
-  .btn-ghost:hover{border-color:var(--ink-3);color:var(--ink)}
-  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-  .btn-row .btn{flex:1 1 auto}
-  .hint-line{margin:14px 0 0;font-size:12.5px;color:var(--ink-3);line-height:1.65}
+  .start-btn:hover{background:#d24c26}
+  .start-btn:active{transform:translateY(1px)}
+  .foot-hint{font-size:11.5px;color:var(--ink-3);text-align:center;margin:0;line-height:1.6}
 
-  .rank-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
-  .rank-item{
-    display:grid;grid-template-columns:28px 1fr auto auto;align-items:center;gap:10px;
-    padding:10px 8px;border-radius:8px;font-size:13.5px;
-  }
-  .rank-item:nth-child(odd){background:var(--paper-2)}
-  .rank-item.me{background:var(--teal-soft);box-shadow:inset 0 0 0 1px rgba(39,117,106,.25)}
-  .rank-no{font-family:var(--font-num);font-size:13px;color:var(--ink-3);text-align:right}
-  .rank-item:nth-child(1) .rank-no{color:var(--accent);font-weight:700}
-  .rank-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .rank-name i{font-style:normal;font-weight:400;font-size:11.5px;color:var(--ink-3);margin-left:6px}
-  .rank-score{font-family:var(--font-num);font-size:15px;font-weight:700;color:var(--ink)}
-  .rank-unit{font-size:11px;color:var(--ink-3);margin-left:2px}
-  .empty-note{font-size:13px;color:var(--ink-3);padding:16px 4px;line-height:1.7;list-style:none}
+  /* ---------- 答题 ---------- */
+  .playbar{display:flex;align-items:stretch;gap:6px;flex:0 0 auto}
+  .stat{flex:1 1 0;min-width:0;background:var(--paper-2);border-radius:9px;padding:6px 8px;display:flex;flex-direction:column;gap:3px}
+  .stat span{font-size:10.5px;color:var(--ink-3);white-space:nowrap}
+  .stat b{font-family:var(--font-num);font-size:16px;font-weight:700;line-height:1}
+  #comboBox{background:var(--teal-soft)}
+  #comboBox b{color:var(--teal)}
+  #quotaBox{background:var(--red-soft)}
+  #quotaBox b{color:var(--red)}
+  #quotaBox.hot{background:var(--red)}
+  #quotaBox.hot b,#quotaBox.hot span{color:#fff}
+  .timer{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;justify-content:center;padding:0 4px}
+  .timer svg{width:34px;height:34px;display:block}
+  .track{fill:none;stroke:var(--line);stroke-width:5}
+  #ringBar{fill:none;stroke:var(--accent);stroke-width:5;stroke-linecap:round}
+  .timer.warn #ringBar{stroke:#d98324}
+  .timer.danger #ringBar{stroke:var(--red)}
+  #timeLeft{font-family:var(--font-num);font-size:12px;font-weight:700;line-height:1}
+  .timer.danger #timeLeft{color:var(--red)}
 
-  .play-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-  .meters{display:flex;gap:8px;flex-wrap:wrap}
-  .meter{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:8px 12px;display:flex;align-items:baseline;gap:6px;min-width:74px}
-  .meter span{font-size:11.5px;color:var(--ink-3)}
-  .meter b{font-family:var(--font-num);font-size:18px;font-weight:700;line-height:1}
-  #comboMeter{border-color:transparent;background:var(--teal-soft)}
-  #comboMeter b{color:var(--teal)}
-  #comboMeter.hot{animation:pop .35s ease}
-  @keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.12)}100%{transform:scale(1)}}
-
-  .lives-box{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-width:150px;flex:1 1 140px;max-width:230px}
-  .lives-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
-  .lives-head span{font-size:11.5px;color:var(--ink-3)}
-  .lives-head b{font-family:var(--font-num);font-size:16px;font-weight:700}
-  .pips{display:flex;gap:3px;margin-top:6px}
-  .pip{flex:1;height:7px;border-radius:3px;background:var(--red);transition:background .18s,opacity .18s}
-  .pip.off{background:var(--line)}
-  .lives-box.low{border-color:rgba(193,56,75,.45);background:var(--red-soft)}
-  .lives-box.low b{color:var(--red)}
-  .lives-box.dead{animation:shake .4s}
-  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
-
-  .qcard{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 18px 20px}
-  .qhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
-  .qprog{font-size:12.5px;color:var(--ink-3)}
-  .qprog b{font-family:var(--font-num);color:var(--ink);font-size:15px}
-  .timer-wrap{display:flex;align-items:center;gap:8px}
-  .timer-ring{width:46px;height:46px;display:block}
-  .timer-ring .track{fill:none;stroke:var(--line);stroke-width:5}
-  .timer-ring .bar{fill:none;stroke:var(--accent);stroke-width:5;stroke-linecap:round;transition:stroke .2s}
-  .timer-ring.warn .bar{stroke:#d98324}
-  .timer-ring.danger .bar{stroke:var(--red)}
-  .timer-num{font-family:var(--font-num);font-size:16px;font-weight:700;min-width:34px;text-align:right}
-  .timer-ring.danger + .timer-num{color:var(--red)}
+  .qmeta{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-3);padding:7px 2px 0;flex:0 0 auto}
+  .qmeta b{font-family:var(--font-num);color:var(--ink);font-size:12.5px}
 
   .question{
-    font-family:var(--font-num);font-size:clamp(28px,9.4vw,50px);font-weight:700;line-height:1.25;
-    text-align:center;padding:26px 4px 24px;letter-spacing:.5px;font-variant-numeric:tabular-nums;word-break:break-word;
+    flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;padding:6px 2px;
+    font-family:var(--font-num);font-size:clamp(26px,9vw,64px);font-weight:700;line-height:1.2;
+    text-align:center;letter-spacing:.4px;font-variant-numeric:tabular-nums;
   }
-  .question .op{color:var(--ink-3);padding:0 4px}
+  .question .op{color:var(--ink-3);padding:0 3px}
   .question .qmark{color:var(--accent)}
 
-  .options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  @media (min-width:640px){.options{grid-template-columns:repeat(4,1fr);gap:12px}}
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:0 0 auto}
+  @media (min-width:600px){.options{grid-template-columns:repeat(4,1fr);gap:10px}}
   .opt{
     appearance:none;cursor:pointer;position:relative;border:1px solid var(--line);background:var(--paper-2);
-    border-radius:12px;padding:16px 8px;min-height:64px;
-    font-family:var(--font-num);font-size:clamp(19px,5.4vw,26px);font-weight:700;color:var(--ink);
-    font-variant-numeric:tabular-nums;transition:background .13s,border-color .13s,transform .1s,color .13s;
+    border-radius:11px;padding:13px 6px;min-height:54px;
+    font-family:var(--font-num);font-size:clamp(17px,4.8vw,23px);font-weight:700;color:var(--ink);
+    font-variant-numeric:tabular-nums;transition:.12s;
   }
-  .opt kbd{position:absolute;top:6px;left:8px;font-family:var(--font-ui);font-size:10px;color:var(--ink-3);border:0;font-weight:400}
+  .opt kbd{position:absolute;top:4px;left:6px;font-family:var(--font-ui);font-size:9.5px;color:var(--ink-3)}
   .opt:hover:not(:disabled){border-color:var(--ink-3);background:var(--white)}
-  .opt:active:not(:disabled){transform:translateY(1px)}
   .opt:disabled{cursor:default}
   .opt.correct{background:var(--teal);border-color:var(--teal);color:#fff}
-  .opt.correct kbd,.opt.wrong kbd{color:rgba(255,255,255,.7)}
   .opt.wrong{background:var(--red);border-color:var(--red);color:#fff}
-  .opt.dim{opacity:.5}
+  .opt.correct kbd,.opt.wrong kbd{color:rgba(255,255,255,.8)}
+  .opt.dim{opacity:.4}
 
-  .feedback{margin-top:14px;min-height:20px;text-align:center;font-size:13.5px;color:var(--ink-2);font-weight:600}
+  .feedback{flex:0 0 auto;min-height:17px;margin:8px 0 0;text-align:center;font-size:12px;font-weight:600;color:var(--ink-2)}
   .feedback.ok{color:var(--teal)}
   .feedback.bad{color:var(--red)}
+  .pips{display:flex;gap:4px;flex:0 0 auto;margin-top:8px}
+  .pip{flex:1;height:5px;border-radius:3px;background:var(--accent);transition:.16s}
+  .pip.off{background:var(--line)}
 
-  .result-hero{text-align:center;padding:8px 0 4px}
-  .result-hero .label{font-size:12.5px;color:var(--ink-3);letter-spacing:1px}
-  .big-score{font-family:var(--font-num);font-size:clamp(44px,14vw,72px);font-weight:700;line-height:1.05;letter-spacing:-1px}
-  .big-score small{font-size:14px;color:var(--ink-3);font-weight:400;margin-left:6px}
-  .rank-badge{display:inline-block;margin-top:8px;padding:6px 12px;border-radius:999px;background:var(--teal-soft);color:var(--teal);font-size:13px;font-weight:600}
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:20px}
-  @media (max-width:560px){.stats{grid-template-columns:1fr 1fr}}
-  .stat{background:var(--paper-2);border-radius:10px;padding:12px 8px;text-align:center}
-  .stat span{display:block;font-size:11.5px;color:var(--ink-3);margin-bottom:5px}
-  .stat b{font-family:var(--font-num);font-size:19px;font-weight:700}
-
-  .wrong-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
-  .wrong-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:var(--paper-2);border-radius:9px;padding:10px 12px;font-size:13.5px}
-  .wrong-item .q{font-family:var(--font-num);font-weight:600}
-  .wrong-item .a{font-size:12px;color:var(--ink-3)}
-  .wrong-item .tag{font-size:11px;color:var(--red);border:1px solid rgba(193,56,75,.35);border-radius:6px;padding:2px 6px}
-
-  footer{margin-top:24px;text-align:center;font-size:11.5px;color:var(--ink-3);line-height:1.9}
-  .float-score{
-    position:absolute;left:50%;top:0;transform:translateX(-50%);
-    font-family:var(--font-num);font-weight:700;font-size:18px;color:var(--teal);
-    pointer-events:none;animation:floatUp .95s ease-out forwards;white-space:nowrap;
+  /* ---------- 弹窗 ---------- */
+  .modal{position:fixed;inset:0;z-index:30;background:rgba(27,34,48,.42);display:grid;place-items:center;padding:14px}
+  .modal-card{
+    width:min(560px,100%);max-height:86vh;max-height:86dvh;background:var(--white);border-radius:14px;
+    border:1px solid var(--line);box-shadow:0 24px 50px -30px rgba(27,34,48,.6);
+    display:flex;flex-direction:column;overflow:hidden;
   }
-  @keyframes floatUp{0%{opacity:0;transform:translate(-50%,6px) scale(.9)}22%{opacity:1;transform:translate(-50%,-4px) scale(1.05)}100%{opacity:0;transform:translate(-50%,-34px) scale(1)}}
-  .score-box{position:relative}
-  @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;transition-duration:.01ms !important}}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px 10px;border-bottom:1px solid var(--line);flex:0 0 auto}
+  .modal-head h2{margin:0;font-size:15px}
+  .x{appearance:none;cursor:pointer;border:0;background:transparent;color:var(--ink-3);font-size:20px;line-height:1;padding:2px 8px;border-radius:6px}
+  .x:hover{color:var(--ink);background:var(--paper-2)}
+  .modal-body{padding:12px 14px 14px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .modal-foot{padding:10px 14px 14px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;flex:0 0 auto}
+  .modal-foot .mini-btn{flex:1 1 auto;min-height:44px;font-size:13.5px}
+
+  .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px}
+  .tab{
+    appearance:none;cursor:pointer;border:1px solid var(--line);background:var(--paper-2);border-radius:8px;
+    padding:7px 2px;font-family:var(--font-ui);font-size:12px;font-weight:600;color:var(--ink-2);
+  }
+  .tab[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .modal-sub{margin:0 0 10px;font-size:11.5px;color:var(--ink-3);line-height:1.6}
+
+  .rank-list{list-style:none;margin:0;padding:0}
+  .rank-list li{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 6px;border-radius:7px;font-size:13px}
+  .rank-list li:nth-child(odd){background:var(--paper-2)}
+  .rank-list li.me{background:var(--teal-soft);box-shadow:inset 0 0 0 1px rgba(39,117,106,.25)}
+  .rank-list .no{font-family:var(--font-num);font-size:12px;color:var(--ink-3);text-align:right}
+  .rank-list li:first-child .no{color:var(--accent);font-weight:700}
+  .rank-list .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rank-list .nm i{font-style:normal;font-weight:400;font-size:10.5px;color:var(--ink-3);margin-left:5px}
+  .rank-list .sc{font-family:var(--font-num);font-weight:700}
+  .rank-list .sc small{font-weight:400;font-size:10.5px;color:var(--ink-3);margin-left:1px}
+  .rank-list li.empty{display:block;grid-template-columns:none;padding:16px 10px;background:none !important;box-shadow:none !important}
+  .empty{font-size:12.5px;color:var(--ink-3);padding:14px 2px;line-height:1.7;text-align:center}
+
+  .score-head{text-align:center;padding:4px 0 2px}
+  .score-head .label{font-size:11.5px;color:var(--ink-3);letter-spacing:1px}
+  .score-head .big{font-family:var(--font-num);font-size:clamp(34px,11vw,52px);font-weight:700;line-height:1.15;letter-spacing:-1px}
+  .score-head .big small{font-size:12px;color:var(--ink-3);font-weight:400;margin-left:4px}
+  .badge{display:inline-block;margin-top:6px;padding:5px 10px;border-radius:999px;background:var(--teal-soft);color:var(--teal);font-size:12px;font-weight:600}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0 4px}
+  .stats div{background:var(--paper-2);border-radius:8px;padding:8px 4px;text-align:center}
+  .stats span{display:block;font-size:10.5px;color:var(--ink-3);margin-bottom:3px}
+  .stats b{font-family:var(--font-num);font-size:15px}
+
+  .wrong-title{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:14px 0 6px}
+  .wrong-title h3{margin:0;font-size:13px}
+  .wrong-title span{font-size:11px;color:var(--ink-3)}
+  .wrong-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+  .wrong-item{background:var(--paper-2);border-radius:9px;padding:9px 10px}
+  .wrong-item .line1{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+  .wrong-item .q{font-family:var(--font-num);font-size:13.5px;font-weight:700}
+  .wrong-item .ans{font-family:var(--font-num);font-size:13px;font-weight:700;color:var(--teal);white-space:nowrap}
+  .wrong-item .you{font-size:11.5px;color:var(--red);margin-top:2px}
+  .wrong-item .steps{font-size:12px;color:var(--ink-2);line-height:1.65;margin-top:5px}
+  .wrong-item .steps b{color:var(--ink);font-weight:600}
+
+  .rules-body{font-size:13px;line-height:1.8;color:var(--ink-2)}
+  .rules-body h3{margin:14px 0 5px;font-size:13.5px;color:var(--ink)}
+  .rules-body h3:first-child{margin-top:0}
+  .rules-body table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12.5px;margin-top:4px}
+  .rules-body th,.rules-body td{padding:7px 6px;text-align:left;border-bottom:1px solid var(--line)}
+  .rules-body th{font-size:11px;color:var(--ink-3);font-weight:600}
+  .rules-body td.n{font-family:var(--font-num);font-weight:700}
+  .rules-body tbody tr:last-child td{border-bottom:0}
+
+  /* ---------- 版本署名 ---------- */
+  .byline{
+    margin:0;text-align:center;font-size:11px;color:var(--ink-3);line-height:1.6;
+    font-family:var(--font-ui);letter-spacing:.2px;
+  }
+  .byline b{font-weight:600;color:var(--ink-2)}
+
+  /* ---------- 动效 ---------- */
+  @keyframes popScore{0%{transform:scale(1)}35%{transform:scale(1.3);color:var(--accent)}100%{transform:scale(1)}}
+  @keyframes comboPulse{0%{transform:scale(1)}40%{transform:scale(1.08)}100%{transform:scale(1)}}
+  @keyframes shakeX{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}50%{transform:translateX(5px)}80%{transform:translateX(-3px)}}
+  @keyframes riseIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes correctFlash{0%{box-shadow:0 0 0 0 rgba(39,117,106,.5)}100%{box-shadow:0 0 0 16px rgba(39,117,106,0)}}
+  @keyframes pulseDanger{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+  @keyframes glowRing{0%,100%{box-shadow:inset 0 0 0 1px rgba(228,87,46,.18)}50%{box-shadow:inset 0 0 0 2px rgba(228,87,46,.55)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .score-pop{animation:popScore .45s ease-out}
+  .combo-pop{animation:comboPulse .45s ease-out}
+  .shake{animation:shakeX .42s ease-out}
+  .question.enter{animation:fadeUp .26s ease-out}
+  .opt{transition:transform .12s,border-color .12s,background .12s}
+  .opt:active:not(:disabled){transform:scale(.965)}
+  .opt.correct{animation:correctFlash .55s ease-out}
+  .timer.danger{animation:pulseDanger 1.05s ease-in-out infinite}
+  .modal-card{animation:riseIn .22s ease-out}
+  .revive-card{animation:riseIn .25s ease-out,glowRing 2.4s ease-in-out .3s infinite}
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important}
+  }
+  .revive-q{
+    font-family:var(--font-num);font-size:clamp(15px,4.4vw,20px);font-weight:700;line-height:1.5;
+    background:var(--paper-2);border-radius:9px;padding:12px 12px;margin-bottom:10px;text-align:center;
+  }
+  .revive-q small{display:block;font-family:var(--font-ui);font-size:11.5px;font-weight:400;color:var(--ink-3);margin-top:5px}
+  .revive-options .opt{font-size:clamp(12.5px,3.2vw,16px);min-height:48px;padding:8px 4px;line-height:1.35;word-break:break-word}
+  .revive-card .modal-head .mode-chip{font-size:11px}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <header class="topbar">
-    <div class="brand">
+  <header class="bar">
+    <div class="who">
       <div class="mark" aria-hidden="true">?</div>
-      <div class="brand-text">
-        <b>心算挑战</b>
-        <span>无限出题 · 连错 10 次结束</span>
+      <div class="who-text">
+        <b id="headName">未取名</b>
+        <span id="headMeta">初中 · 25 秒 · 错 6 题止</span>
       </div>
     </div>
-    <div class="chips">
-      <div class="rule-chip" id="ruleChip">每题 <strong>25</strong> 秒 · 250 分</div>
-      <div class="mode-chip local" id="modeChip">本机榜单</div>
+    <div class="bar-actions">
+      <span class="mode-chip" id="modeChip">本机榜</span>
+      <button type="button" class="mini-btn" id="rankBtn">排行榜</button>
+      <button type="button" class="mini-btn" id="helpBtn">规则</button>
+      <button type="button" class="mini-btn" id="quitBtn" hidden>退出</button>
     </div>
   </header>
 
-  <main>
-    <!-- ===== 首页 ===== -->
-    <section class="screen" id="screen-home">
-      <div class="card hero">
-        <h1>一道题 <em>250 分</em>，能撑多久？</h1>
-        <p>不限题数，答对一直往下走，连续答错 10 次才结束。每道题的限时和分值随难度变化：小学 10 秒、初中 25 秒、高中 35 秒、大学 60 秒。答错不扣分，但会扣一颗心。</p>
-
-        <div class="start-grid">
-          <div>
-            <label class="field-label" for="nameInput">你的昵称 <span>（排行榜里显示这个名字）</span></label>
-            <input id="nameInput" type="text" maxlength="12" placeholder="例如：小林" autocomplete="off">
-          </div>
-          <div>
-            <span class="field-label">难度类型 <span>（决定限时与每题分值）</span></span>
-            <div class="levels" id="levelGroup" role="group" aria-label="难度选择">
-              <button type="button" class="level-btn" data-level="primary" aria-pressed="false">
-                <b>小学</b><small>20 以内加减<br>九九乘法</small><span class="tag">10s · 200 分</span>
-              </button>
-              <button type="button" class="level-btn" data-level="junior" aria-pressed="true">
-                <b>初中</b><small>三位数加减<br>两位数乘除</small><span class="tag">25s · 250 分</span>
-              </button>
-              <button type="button" class="level-btn" data-level="senior" aria-pressed="false">
-                <b>高中</b><small>平方开方<br>混合运算</small><span class="tag">35s · 325 分</span>
-              </button>
-              <button type="button" class="level-btn" data-level="university" aria-pressed="false">
-                <b>大学</b><small>阶乘组合<br>取模求和</small><span class="tag">60s · 425 分</span>
-              </button>
-            </div>
-          </div>
+  <main class="board">
+    <section class="view" id="viewStart">
+      <div class="hero">
+        <h1>一道题 <em>250 分</em>，你能撑几题？</h1>
+        <p>不限题数，累计答错到额度上限才结束。答对加分，答错扣额度，额度不回补；四档难度各有自己的限时、分值和容错。</p>
+        <div class="chips">
+          <span>不限题数</span>
+          <span>答错不补额度</span>
+          <span>四档分榜</span>
+          <span>错题带解析</span>
         </div>
-
-        <div class="btn-row">
-          <button type="button" class="btn btn-primary" id="startBtn">开始挑战</button>
-        </div>
-        <p class="hint-line">键盘 1 / 2 / 3 / 4 可直接选答案。心只剩 1 颗时生命条变红，注意节奏。</p>
       </div>
 
-      <div class="card">
-        <div class="card-head">
-          <h2>排行榜</h2>
-          <span id="homeRankScope">按最高单局分排序</span>
+      <div class="setup">
+        <div class="field">
+          <label for="nameInput">昵称</label>
+          <input id="nameInput" type="text" maxlength="12" placeholder="先取个名字，排行榜要用" autocomplete="off">
+          <span class="field-hint" id="nameHint">1–12 个字，不能只填空格</span>
         </div>
-        <ol class="rank-list" id="homeRank"></ol>
+        <div class="field">
+          <label>难度类型</label>
+          <div class="levels" id="levelGroup" role="group" aria-label="难度选择">
+            <button type="button" class="level-btn" data-level="primary" aria-pressed="false">
+              <b>小学</b><small>10s · 200<br>错 8</small>
+            </button>
+            <button type="button" class="level-btn" data-level="junior" aria-pressed="true">
+              <b>初中</b><small>25s · 250<br>错 6</small>
+            </button>
+            <button type="button" class="level-btn" data-level="senior" aria-pressed="false">
+              <b>高中</b><small>35s · 325<br>错 5</small>
+            </button>
+            <button type="button" class="level-btn" data-level="university" aria-pressed="false">
+              <b>大学</b><small>60s · 425<br>错 4</small>
+            </button>
+          </div>
+        </div>
       </div>
+
+      <button type="button" class="start-btn" id="startBtn">开始挑战</button>
+      <p class="foot-hint" id="startHint">每题 250 分 · 键盘 1–4 选答案</p>
+      <p class="byline"><b>© 新力 | 杨博骞</b> · 心算挑战 v2.0.0 · 更新于 2026-11-19 · 单屏版 / 复活赛</p>
     </section>
 
-    <!-- ===== 答题页 ===== -->
-    <section class="screen" id="screen-play" hidden>
-      <div class="play-top">
-        <div class="meters">
-          <div class="meter score-box" id="scoreBox"><span>得分</span><b id="scoreVal">0</b></div>
-          <div class="meter" id="comboMeter"><span>连击</span><b id="comboVal">0</b></div>
-        </div>
-        <div class="lives-box" id="livesBox">
-          <div class="lives-head"><span>生命</span><b><span id="livesVal">10</span>/10</b></div>
-          <div class="pips" id="pips"></div>
-        </div>
-        <button type="button" class="btn btn-ghost" id="quitBtn" style="padding:10px 14px;font-size:13px;min-height:40px;flex:0 0 auto">退出</button>
-      </div>
-
-      <div class="qcard">
-        <div class="qhead">
-          <div class="qprog">第 <b id="qIndex">1</b> 题 · 已答对 <b id="qCorrect">0</b></div>
-          <div class="timer-wrap">
-            <svg class="timer-ring" id="timerRing" viewBox="0 0 46 46" aria-hidden="true">
-              <circle class="track" cx="23" cy="23" r="19.5"></circle>
-              <circle class="bar" id="ringBar" cx="23" cy="23" r="19.5"></circle>
-            </svg>
-            <span class="timer-num" id="timeLeft">25</span>
-          </div>
-        </div>
-
-        <div class="question" id="questionText" aria-live="polite"></div>
-        <div class="options" id="options"></div>
-        <p class="feedback" id="feedback" aria-live="polite"></p>
-      </div>
-    </section>
-
-    <!-- ===== 结束页 ===== -->
-    <section class="screen" id="screen-done" hidden>
-      <div class="card">
-        <div class="result-hero">
-          <div class="label">本轮得分</div>
-          <div class="big-score"><span id="finalScore">0</span><small>分</small></div>
-          <div class="rank-badge" id="myRankBadge">正在上传成绩…</div>
-        </div>
-
-        <div class="stats">
-          <div class="stat"><span>答对</span><b id="finalCorrect">0</b></div>
-          <div class="stat"><span>总题数</span><b id="finalTotal">0</b></div>
-          <div class="stat"><span>最长连对</span><b id="finalCombo">0</b></div>
-          <div class="stat"><span>存活</span><b id="finalTime">0s</b></div>
-        </div>
-
-        <div class="btn-row">
-          <button type="button" class="btn btn-primary" id="againBtn">再来一轮</button>
-          <button type="button" class="btn btn-ghost" id="homeBtn">返回首页</button>
+    <section class="view" id="viewPlay" hidden>
+      <div class="playbar">
+        <div class="stat"><span>得分</span><b id="scoreVal">0</b></div>
+        <div class="stat" id="comboBox"><span>连对</span><b id="comboVal">0</b></div>
+        <div class="stat" id="quotaBox"><span>还能错</span><b id="quotaVal">6</b></div>
+        <div class="timer" id="timerBox">
+          <svg viewBox="0 0 46 46" aria-hidden="true">
+            <circle class="track" cx="23" cy="23" r="19.5"></circle>
+            <circle id="ringBar" cx="23" cy="23" r="19.5"></circle>
+          </svg>
+          <span id="timeLeft">25</span>
         </div>
       </div>
 
-      <div class="card" id="wrongCard" hidden>
-        <div class="card-head">
-          <h2>这轮错的题</h2>
-          <span>按出错顺序排列</span>
-        </div>
-        <ul class="wrong-list" id="wrongList"></ul>
+      <div class="qmeta">
+        <span>第 <b id="qIndex">1</b> 题</span>
+        <span>答对 <b id="qCorrect">0</b> · 错 <b id="qWrong">0</b></span>
       </div>
 
-      <div class="card">
-        <div class="card-head">
-          <h2>排行榜</h2>
-          <span id="doneRankScope">按最高单局分排序</span>
-        </div>
-        <ol class="rank-list" id="doneRank"></ol>
-      </div>
+      <div class="question" id="questionText" aria-live="polite"></div>
+      <div class="options" id="options"></div>
+      <p class="feedback" id="feedback" aria-live="polite"></p>
+      <div class="pips" id="pips" aria-hidden="true"></div>
     </section>
   </main>
+</div>
 
-  <footer>
-    <div id="footNote">成绩只保存在本台电脑的浏览器里，清缓存会一起清掉。</div>
-    <div>答错扣一颗心，答对回满 10 颗；连错 10 次结束。</div>
-  </footer>
+<div class="modal" id="rankModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="rankTitle">
+    <div class="modal-head">
+      <h2 id="rankTitle">排行榜</h2>
+      <button type="button" class="x" data-close aria-label="关闭">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="tabs" id="rankTabs">
+        <button type="button" class="tab" data-level="primary" aria-pressed="false">小学</button>
+        <button type="button" class="tab" data-level="junior" aria-pressed="true">初中</button>
+        <button type="button" class="tab" data-level="senior" aria-pressed="false">高中</button>
+        <button type="button" class="tab" data-level="university" aria-pressed="false">大学</button>
+      </div>
+      <p class="modal-sub" id="rankSub">每个难度单独排名，同一个人只取最好的一局</p>
+      <ol class="rank-list" id="rankList"></ol>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="resultModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+    <div class="modal-head">
+      <h2 id="resultTitle">本轮结束</h2>
+      <button type="button" class="x" data-close aria-label="关闭">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="score-head">
+        <div class="label">本轮得分</div>
+        <div class="big"><span id="finalScore">0</span><small>分</small></div>
+        <div class="badge" id="myRankBadge">正在上传…</div>
+      </div>
+      <div class="stats">
+        <div><span>答对</span><b id="finalCorrect">0</b></div>
+        <div><span>总题数</span><b id="finalTotal">0</b></div>
+        <div><span>最长连对</span><b id="finalCombo">0</b></div>
+        <div><span>用时</span><b id="finalTime">0s</b></div>
+      </div>
+
+      <div class="wrong-title">
+        <h3>错题解析</h3>
+        <span id="wrongCount">0 题</span>
+      </div>
+      <ul class="wrong-list" id="wrongList"></ul>
+      <p class="empty" id="wrongEmpty" hidden>这轮没有错题，漂亮。</p>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="mini-btn primary" id="againBtn">再来一轮</button>
+      <button type="button" class="mini-btn" id="resultRankBtn">看排行榜</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="reviveModal" hidden>
+  <div class="modal-card revive-card" role="dialog" aria-modal="true" aria-labelledby="reviveTitle">
+    <div class="modal-head">
+      <h2 id="reviveTitle">复活赛</h2>
+      <span class="mode-chip" id="reviveCount">剩余 2 次</span>
+    </div>
+    <div class="modal-body">
+      <p class="modal-sub" id="reviveSub">额度用完了。答对下面这道知识点题，回 1 份额度继续答题。</p>
+      <div class="revive-q" id="reviveQuestion"></div>
+      <div class="options revive-options" id="reviveOptions"></div>
+      <p class="feedback" id="reviveFeedback" aria-live="polite"></p>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="mini-btn" id="giveUpBtn">放弃复活，结束本轮</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="helpModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="modal-head">
+      <h2 id="helpTitle">玩法与分值</h2>
+      <button type="button" class="x" data-close aria-label="关闭">×</button>
+    </div>
+    <div class="modal-body rules-body">
+      <h3>怎么算结束</h3>
+      <p>题目不限量。每答错一题（含超时）扣一份「错题额度」，额度用完即本轮结束；答对不会把额度补回来。额度和难度挂钩：难题容错更少，但每题更值钱。</p>
+
+      <h3>复活赛</h3>
+      <p>额度归零时先别急着结算：系统会出一道公式 / 知识点四选一，<b>限时 20 秒</b>答对就回 1 份额度继续答题。每轮最多复活 2 次，复活不额外加分。答错、超时或放弃复活，本轮立即结束并进入结算。</p>
+
+      <h3>分值怎么来</h3>
+      <p>每题固定按 250 分 × 难度比例折算：小学 80%、初中 100%、高中 130%、大学 170%。总分只等于「答对数 × 该档分值」，没有速度或连击加成。</p>
+
+      <h3>四档对照</h3>
+      <table>
+        <thead><tr><th style="width:20%">类型</th><th style="width:22%">限时</th><th style="width:26%">每题得分</th><th style="width:32%">错题额度</th></tr></thead>
+        <tbody>
+          <tr><td>小学</td><td class="n">10 秒</td><td class="n">200 分</td><td class="n">8 题</td></tr>
+          <tr><td>初中</td><td class="n">25 秒</td><td class="n">250 分</td><td class="n">6 题</td></tr>
+          <tr><td>高中</td><td class="n">35 秒</td><td class="n">325 分</td><td class="n">5 题</td></tr>
+          <tr><td>大学</td><td class="n">60 秒</td><td class="n">425 分</td><td class="n">4 题</td></tr>
+        </tbody>
+      </table>
+
+      <h3>排行榜</h3>
+      <p>四个难度分开排，同一昵称只取最好的一局；并列时先看局数多的，再比最长连对。连上服务器就是跨设备榜，连不上自动退回本机记录。</p>
+
+      <h3>操作</h3>
+      <p>键盘 1 / 2 / 3 / 4（或 A / B / C / D）直接选答案；点「退出」放弃本轮，不计入排行榜。</p>
+
+      <h3>版本</h3>
+      <p>心算挑战 v2.0.0 · 作者 新力 | 杨博骞 · 2026-11-19 更新：单屏界面 + 累计错题额度 + 错题解析 + 分难度榜 + 复活赛。</p>
+    </div>
+  </div>
 </div>
 
 <script>
 (function () {
   'use strict';
 
-  var LIVES_TOTAL = 10;
-  var STORE_KEY = 'math20_rounds_v1';
+  var STORE_KEY = 'math_rounds_v1';
+  var NAME_KEY = 'math_name_v1';
   var MAX_ROUNDS = 600;
   var RING_LEN = 2 * Math.PI * 19.5;
 
-  /* 四档类型：限时（秒）与每题分值（250 分基准 × 80% / 100% / 130% / 170%） */
   var LEVELS = {
-    primary:    { name: '小学', seconds: 10, value: 200 },
-    junior:     { name: '初中', seconds: 25, value: 250 },
-    senior:     { name: '高中', seconds: 35, value: 325 },
-    university: { name: '大学', seconds: 60, value: 425 }
+    primary: { name: '小学', seconds: 10, value: 200, limit: 8 },
+    junior: { name: '初中', seconds: 25, value: 250, limit: 6 },
+    senior: { name: '高中', seconds: 35, value: 325, limit: 5 },
+    university: { name: '大学', seconds: 60, value: 425, limit: 4 }
   };
 
   var state = {
-    name: '',
-    level: 'junior',
-    question: null,
-    index: 0,
-    score: 0,
-    correct: 0,
-    total: 0,
-    streak: 0,
-    maxStreak: 0,
-    wrongStreak: 0,
-    wrong: [],
-    answered: false,
-    deadline: 0,
-    duration: 25,
-    raf: 0,
-    startTs: 0
+    name: '', level: 'junior', question: null, index: 0,
+    score: 0, correct: 0, total: 0, wrong: 0, streak: 0, maxStreak: 0,
+    wrongList: [], answered: false, deadline: 0, duration: 25, raf: 0, startTs: 0,
+    revivesUsed: 0, reviveAnswer: null, reviveAnswered: false, reviveDeadline: 0,
+    reviveRaf: 0, reviveIndex: 0
   };
 
+  var MAX_REVIVE = 2;
+  var REVIVE_SECONDS = 20;
+
+  /* 复活赛题库：公式 / 知识点四选一 */
+  var REVIVE_BANK = [
+    { q: '圆的面积公式是？', options: ['πr²', '2πr', 'πd', '2πd'], answer: 'πr²', note: 'S = πr²；2πr 是周长。' },
+    { q: '勾股定理的正确写法是？', options: ['a² + b² = c²', 'a + b = c', 'a² − b² = c²', 'ab = c²'], answer: 'a² + b² = c²', note: '直角三角形两直角边平方和等于斜边平方。' },
+    { q: '一元二次方程 ax² + bx + c = 0 的求根公式是？', options: ['(−b ± √(b² − 4ac)) / 2a', '(b ± √(b² + 4ac)) / 2a', '(−b ± √(4ac − b²)) / a', '(−b ± √(b² − 4ac)) / a'], answer: '(−b ± √(b² − 4ac)) / 2a', note: '判别式 Δ = b² − 4ac。' },
+    { q: '三角形面积（底 a、高 h）是？', options: ['a·h / 2', 'a + h', 'a·h', '2a·h'], answer: 'a·h / 2', note: '平行四边形的面积是 a·h，三角形取一半。' },
+    { q: '等差数列前 n 项和公式是？', options: ['n(a₁ + aₙ) / 2', 'n(a₁ + aₙ)', 'n·aₙ / 2', 'a₁ + aₙ / 2'], answer: 'n(a₁ + aₙ) / 2', note: '也等于 n·a₁ + n(n−1)d/2。' },
+    { q: '√2 约等于？', options: ['1.414', '1.732', '2.236', '1.236'], answer: '1.414', note: '√3 ≈ 1.732，√5 ≈ 2.236。' },
+    { q: '圆周率 π 约等于？', options: ['3.14', '2.72', '1.41', '4.13'], answer: '3.14', note: 'e ≈ 2.718。' },
+    { q: '100 以内最大的质数是？', options: ['97', '99', '91', '93'], answer: '97', note: '99 = 9×11，91 = 7×13，93 = 3×31。' },
+    { q: '(a + b)² 展开等于？', options: ['a² + 2ab + b²', 'a² + b²', 'a² − 2ab + b²', 'a² + ab + b²'], answer: 'a² + 2ab + b²', note: '完全平方公式，中间项是 2ab。' },
+    { q: 'a³ − b³ 分解为？', options: ['(a − b)(a² + ab + b²)', '(a + b)(a² − ab + b²)', '(a − b)(a² − ab + b²)', '(a − b)³'], answer: '(a − b)(a² + ab + b²)', note: '立方差公式。' },
+    { q: '球的体积公式是？', options: ['4/3 πr³', '4πr²', '2/3 πr³', 'πr³'], answer: '4/3 πr³', note: '球表面积才是 4πr²。' },
+    { q: 'log(a·b) 等于？', options: ['log a + log b', 'log a · log b', 'log a − log b', 'log(a) / log(b)'], answer: 'log a + log b', note: '积的对数 = 对数的和。' },
+    { q: 'sin²θ + cos²θ 等于？', options: ['1', '0', '2', 'tan θ'], answer: '1', note: '同角三角函数的平方关系。' },
+    { q: '0! 等于？', options: ['1', '0', '不存在', '∞'], answer: '1', note: '规定 0! = 1，便于组合数公式成立。' },
+    { q: '60% 对应的分数是？', options: ['3/5', '6/10', '2/3', '5/8'], answer: '3/5', note: '60% = 60/100 = 3/5。注意 6/10 等值但未约分。' },
+    { q: '2¹⁰ 等于？', options: ['1024', '512', '2048', '1000'], answer: '1024', note: '2¹⁰ = 1024，也是 1 KB 的由来。' },
+    { q: '平行线被截时，内错角？', options: ['相等', '互补', '互余', '不确定'], answer: '相等', note: '同位角相等、内错角相等、同旁内角互补。' },
+    { q: '正方形边长为 a 时，对角线长是？', options: ['a√2', 'a√3', '2a', 'a/2'], answer: 'a√2', note: '由勾股定理：a² + a² = 2a²。' }
+  ];
+
   var MODE = 'local';
-  var CLOUD_LIST = null;
+  var CLOUD = { primary: null, junior: null, senior: null, university: null };
   var memoryRounds = [];
+  var rankTab = 'junior';
 
   function $(id) { return document.getElementById(id); }
   function rand(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
@@ -411,79 +524,175 @@
     }
     return arr;
   }
+  function levelInfo(key) { return LEVELS[key] || LEVELS.junior; }
+  function factorial(n) { var r = 1; for (var i = 2; i <= n; i += 1) r *= i; return r; }
+  function gcd(a, b) { while (b) { var t = a % b; a = b; b = t; } return a; }
   function el(tag, cls, text) {
     var node = document.createElement(tag);
     if (cls) node.className = cls;
     if (text !== undefined) node.textContent = text;
     return node;
   }
-  function levelInfo() { return LEVELS[state.level] || LEVELS.junior; }
-  function factorial(n) { var r = 1; for (var i = 2; i <= n; i += 1) r *= i; return r; }
-  function comb(n, k) { return factorial(n) / (factorial(k) * factorial(n - k)); }
-  function gcd(a, b) { while (b) { var t = a % b; a = b; b = t; } return a; }
 
-  function showScreen(id) {
-    ['screen-home', 'screen-play', 'screen-done'].forEach(function (sid) {
-      $(sid).hidden = sid !== id;
-    });
-    window.scrollTo({ top: 0, behavior: 'auto' });
-  }
-
-  /* ---------------------------- 出题 ---------------------------- */
+  /* ============ 出题：每题自带解析步骤 ============ */
   function makeQuestion(level) {
-    var a, b, c, d, q;
+    var a, b, c, d, q, t;
 
     if (level === 'primary') {
-      var t = rand(1, 4);
-      if (t === 1) { a = rand(2, 15); b = rand(2, 15); return { text: a + ' + ' + b, answer: a + b }; }
-      if (t === 2) { a = rand(8, 20); b = rand(1, a - 1); return { text: a + ' − ' + b, answer: a - b }; }
-      if (t === 3) { a = rand(2, 9); b = rand(2, 9); return { text: a + ' × ' + b, answer: a * b }; }
+      t = rand(1, 4);
+      if (t === 1) {
+        a = rand(2, 15); b = rand(2, 15);
+        return {
+          text: a + ' + ' + b,
+          answer: a + b,
+          steps: '个位 ' + (a % 10) + ' + ' + (b % 10) + ' = ' + ((a % 10) + (b % 10)) + '，十位再相加，合计 ' + (a + b) + '。'
+        };
+      }
+      if (t === 2) {
+        a = rand(8, 20); b = rand(1, a - 1);
+        return {
+          text: a + ' − ' + b,
+          answer: a - b,
+          steps: '个位 ' + (a % 10) + ' 减 ' + b + ' 不够，向十位借 10：' + (a % 10 + 10) + ' − ' + b + ' = ' + (a % 10 + 10 - b) + '，十位少 1，结果是 ' + (a - b) + '。'
+        };
+      }
+      if (t === 3) {
+        a = rand(2, 9); b = rand(2, 9);
+        return { text: a + ' × ' + b, answer: a * b, steps: '查九九乘法表：' + a + ' × ' + b + ' = ' + (a * b) + '。' };
+      }
       b = rand(2, 9); q = rand(2, 9);
-      return { text: (b * q) + ' ÷ ' + b, answer: q };
+      return {
+        text: (b * q) + ' ÷ ' + b,
+        answer: q,
+        steps: '想乘法：' + b + ' × ' + q + ' = ' + (b * q) + '，所以 ' + (b * q) + ' ÷ ' + b + ' = ' + q + '。'
+      };
     }
 
     if (level === 'junior') {
-      var u = rand(1, 5);
-      if (u === 1) { a = rand(120, 480); b = rand(90, a - 20); return { text: a + ' + ' + b, answer: a + b }; }
-      if (u === 2) { a = rand(320, 900); b = rand(80, a - 30); return { text: a + ' − ' + b, answer: a - b }; }
-      if (u === 3) { a = rand(11, 39); b = rand(3, 9); return { text: a + ' × ' + b, answer: a * b }; }
-      if (u === 4) { b = rand(3, 12); q = rand(12, 40); return { text: (b * q) + ' ÷ ' + b, answer: q }; }
+      t = rand(1, 5);
+      if (t === 1) {
+        a = rand(120, 480); b = rand(90, a - 20);
+        return {
+          text: a + ' + ' + b,
+          answer: a + b,
+          steps: '按位相加：个位 ' + (a % 10) + ' + ' + (b % 10) + ' = ' + ((a % 10) + (b % 10)) + '，进位继续累加，最后得 ' + (a + b) + '。'
+        };
+      }
+      if (t === 2) {
+        a = rand(320, 900); b = rand(80, a - 30);
+        return {
+          text: a + ' − ' + b,
+          answer: a - b,
+          steps: '逐位相减，个位或十位不够就向左借 1 当 10，' + a + ' − ' + b + ' = ' + (a - b) + '。'
+        };
+      }
+      if (t === 3) {
+        a = rand(11, 39); b = rand(3, 9);
+        return {
+          text: a + ' × ' + b,
+          answer: a * b,
+          steps: '拆位相乘：' + (Math.floor(a / 10) * 10) + ' × ' + b + ' = ' + (Math.floor(a / 10) * 10 * b) + '，' +
+            (a % 10) + ' × ' + b + ' = ' + ((a % 10) * b) + '，相加得 ' + (a * b) + '。'
+        };
+      }
+      if (t === 4) {
+        b = rand(3, 12); q = rand(12, 40);
+        return {
+          text: (b * q) + ' ÷ ' + b,
+          answer: q,
+          steps: '用乘法反推：' + b + ' × ' + q + ' = ' + (b * q) + '，所以商是 ' + q + '。'
+        };
+      }
       a = rand(6, 19); b = rand(3, 9); c = rand(4, a * b - 1);
-      return { text: a + ' × ' + b + ' − ' + c, answer: a * b - c };
+      return {
+        text: a + ' × ' + b + ' − ' + c,
+        answer: a * b - c,
+        steps: '先乘后减：' + a + ' × ' + b + ' = ' + (a * b) + '，再减 ' + c + '，得 ' + (a * b - c) + '。'
+      };
     }
 
     if (level === 'senior') {
-      var v = rand(1, 4);
-      if (v === 1) { a = rand(11, 25); return { text: a + '²', answer: a * a }; }
-      if (v === 2) { a = rand(2, 9); c = rand(5, 19); return { text: '(' + a + ' + ' + c + ')²', answer: (a + c) * (a + c) }; }
-      if (v === 3) { a = rand(6, 30); return { text: '√' + (a * a), answer: a }; }
+      t = rand(1, 4);
+      if (t === 1) {
+        a = rand(11, 25);
+        return {
+          text: a + '²',
+          answer: a * a,
+          steps: a + '² 就是 ' + a + ' × ' + a + ' = ' + (a * a) + '。'
+        };
+      }
+      if (t === 2) {
+        a = rand(2, 9); c = rand(5, 19);
+        return {
+          text: '(' + a + ' + ' + c + ')²',
+          answer: (a + c) * (a + c),
+          steps: '先算括号：' + a + ' + ' + c + ' = ' + (a + c) + '；再平方：' + (a + c) + ' × ' + (a + c) + ' = ' + ((a + c) * (a + c)) + '。'
+        };
+      }
+      if (t === 3) {
+        a = rand(6, 30);
+        return {
+          text: '√' + (a * a),
+          answer: a,
+          steps: '因为 ' + a + '² = ' + (a * a) + '，所以 √' + (a * a) + ' = ' + a + '。'
+        };
+      }
       a = rand(12, 40); b = rand(3, 9); c = rand(2, 8); d = rand(10, 90);
-      return { text: a + ' × ' + b + ' + ' + c + ' × ' + d, answer: a * b + c * d };
+      return {
+        text: a + ' × ' + b + ' + ' + c + ' × ' + d,
+        answer: a * b + c * d,
+        steps: '两项分别相乘：' + a + '×' + b + ' = ' + (a * b) + '，' + c + '×' + d + ' = ' + (c * d) + '，相加得 ' + (a * b + c * d) + '。'
+      };
     }
 
-    var w = rand(1, 5);
-    if (w === 1) { a = rand(4, 7); return { text: a + '!', answer: factorial(a) }; }
-    if (w === 2) { a = rand(5, 9); b = rand(2, 3); return { text: 'C(' + a + ',' + b + ')', answer: comb(a, b) }; }
-    if (w === 3) { a = rand(4, 10); return { text: '2^' + a, answer: Math.pow(2, a) }; }
-    if (w === 4) {
-      /* 造一对真有大公因数的数，避免答案老是 1 */
-      var g = rand(2, 9);
-      var m1 = rand(2, 9);
-      var m2 = rand(2, 9);
-      while (gcd(m1, m2) !== 1 || m1 === m2) { m1 = rand(2, 9); m2 = rand(2, 9); }
-      return { text: 'gcd(' + (g * m1) + ',' + (g * m2) + ')', answer: g };
+    t = rand(1, 5);
+    if (t === 1) {
+      a = rand(4, 6);
+      var parts = [];
+      for (var i = a; i >= 1; i -= 1) parts.push(i);
+      return { text: a + '!', answer: factorial(a), steps: a + '! = ' + parts.join(' × ') + ' = ' + factorial(a) + '。' };
     }
-    b = rand(3, 9); var k = rand(2, 6); var r = rand(1, b - 1);
+    if (t === 2) {
+      a = rand(5, 9); b = rand(2, 3);
+      var num = [];
+      for (var j = 0; j < b; j += 1) num.push(a - j);
+      return {
+        text: 'C(' + a + ',' + b + ')',
+        answer: factorial(a) / (factorial(b) * factorial(a - b)),
+        steps: 'C(' + a + ',' + b + ') = (' + num.join(' × ') + ') / ' + b + '! = ' + (factorial(a) / factorial(a - b)) +
+          ' / ' + factorial(b) + ' = ' + (factorial(a) / (factorial(b) * factorial(a - b))) + '。'
+      };
+    }
+    if (t === 3) {
+      a = rand(4, 10);
+      var powList = [];
+      for (var p = 1; p <= a; p += 1) powList.push(Math.pow(2, p));
+      return { text: '2^' + a, answer: Math.pow(2, a), steps: '2 连乘 ' + a + ' 次：' + powList.join(' → ') + '。' };
+    }
+    if (t === 4) {
+      var g = rand(2, 9), m1 = rand(2, 9), m2 = rand(2, 9);
+      while (gcd(m1, m2) !== 1 || m1 === m2) { m1 = rand(2, 9); m2 = rand(2, 9); }
+      var x = g * m1, y = g * m2;
+      return {
+        text: 'gcd(' + x + ',' + y + ')',
+        answer: g,
+        steps: '分解：' + x + ' = ' + m1 + ' × ' + g + '，' + y + ' = ' + m2 + ' × ' + g + '，两边共有的最大因数就是 ' + g + '。'
+      };
+    }
+    b = rand(3, 9);
+    var k = rand(2, 6), r = rand(1, b - 1);
     a = b * k + r;
-    return { text: a + ' mod ' + b, answer: r };
+    return {
+      text: a + ' mod ' + b,
+      answer: r,
+      steps: '找不超过 ' + a + ' 的最大倍数：' + b + ' × ' + k + ' = ' + (b * k) + '，' + a + ' − ' + (b * k) + ' = ' + r + '，余数即 ' + r + '。'
+    };
   }
 
   function buildOptions(answer) {
     var digits = String(Math.abs(answer)).length;
     var step = digits <= 2 ? 2 : Math.pow(10, digits - 2);
-    var offsets = [step, -step, 2 * step, -2 * step, 3 * step, -3 * step, 1, -1];
-    shuffle(offsets);
-
+    var offsets = shuffle([step, -step, 2 * step, -2 * step, 3 * step, -3 * step, 1, -1]);
     var set = [answer];
     var i = 0;
     while (set.length < 4 && i < offsets.length) {
@@ -500,20 +709,15 @@
     return shuffle(set);
   }
 
-  function nextQuestion() {
-    var q = makeQuestion(state.level);
-    q.options = buildOptions(q.answer);
-    state.question = q;
-  }
-
-  /* ---------------------------- 计时 ---------------------------- */
+  /* ============ 计时 ============ */
   function paintTimer(leftMs) {
-    var ratio = Math.max(0, Math.min(1, leftMs / (state.duration * 1000)));
+    var total = state.duration * 1000;
+    var ratio = Math.max(0, Math.min(1, leftMs / total));
     var bar = $('ringBar');
-    bar.style.strokeDasharray = String(RING_LEN);
-    bar.style.strokeDashoffset = String(RING_LEN * (1 - ratio));
-    var ring = $('timerRing');
-    ring.setAttribute('class', 'timer-ring' + (leftMs <= state.duration * 1000 * 0.15 ? ' danger' : (leftMs <= state.duration * 1000 * 0.4 ? ' warn' : '')));
+    bar.setAttribute('stroke-dasharray', String(RING_LEN));
+    bar.setAttribute('stroke-dashoffset', String(RING_LEN * (1 - ratio)));
+    var box = $('timerBox');
+    box.setAttribute('class', 'timer' + (leftMs <= total * 0.15 ? ' danger' : (leftMs <= total * 0.4 ? ' warn' : '')));
     $('timeLeft').textContent = String(Math.max(0, Math.ceil(leftMs / 1000)));
   }
 
@@ -536,47 +740,74 @@
     state.raf = 0;
   }
 
-  /* ---------------------------- 生命 ---------------------------- */
+  /* ============ 额度 ============ */
   function buildPips() {
     var box = $('pips');
     box.textContent = '';
-    for (var i = 0; i < LIVES_TOTAL; i += 1) box.appendChild(el('div', 'pip'));
+    var limit = levelInfo(state.level).limit;
+    for (var i = 0; i < limit; i += 1) box.appendChild(el('span', 'pip'));
   }
 
-  function paintLives() {
-    var lives = Math.max(0, LIVES_TOTAL - state.wrongStreak);
-    $('livesVal').textContent = String(lives);
+  function paintQuota() {
+    var limit = levelInfo(state.level).limit;
+    var left = Math.max(0, limit - state.wrong);
+    $('quotaVal').textContent = String(left);
     var pips = $('pips').children;
-    for (var i = 0; i < pips.length; i += 1) {
-      pips[i].className = i < lives ? 'pip' : 'pip off';
-    }
-    var box = $('livesBox');
-    box.className = 'lives-box' + (lives <= 1 ? ' low' : '');
-    if (lives <= 1) {
-      box.classList.add('dead');
-      setTimeout(function () { if (box) box.classList.remove('dead'); }, 420);
-    }
+    for (var i = 0; i < pips.length; i += 1) pips[i].className = i < left ? 'pip' : 'pip off';
+    $('qWrong').textContent = String(state.wrong);
+    $('quotaBox').setAttribute('class', 'stat' + (left <= 1 ? ' hot' : ''));
   }
 
-  /* ---------------------------- 答题 ---------------------------- */
+  /* ============ 视图 ============ */
+  function showStart() {
+    $('viewStart').hidden = false;
+    $('viewPlay').hidden = true;
+    $('quitBtn').hidden = true;
+    $('headName').textContent = state.name || '未取名';
+    syncHeadMeta();
+  }
+
+  function showPlay() {
+    $('headName').textContent = state.name || '未取名';
+    $('viewStart').hidden = true;
+    $('viewPlay').hidden = false;
+    $('quitBtn').hidden = false;
+    syncHeadMeta();
+  }
+
+  function syncHeadMeta() {
+    var info = levelInfo(state.level);
+    $('headMeta').textContent = info.name + ' · ' + info.seconds + ' 秒 · 错 ' + info.limit + ' 题止';
+    $('startHint').textContent = '每题 ' + info.value + ' 分 · 键盘 1–4 选答案';
+  }
+
+  function openModal(id) { $(id).hidden = false; }
+  function closeModal(id) { $(id).hidden = true; }
+  function closeAll() {
+    ['rankModal', 'resultModal', 'helpModal', 'reviveModal'].forEach(function (id) { $(id).hidden = true; });
+    stopReviveTimer();
+  }
+
+  /* ============ 出题与答题 ============ */
   function renderQuestion() {
     state.index += 1;
-    nextQuestion();
+    var q = makeQuestion(state.level);
+    q.options = buildOptions(q.answer);
+    state.question = q;
     state.answered = false;
 
-    var q = state.question;
     $('qIndex').textContent = String(state.index);
     $('qCorrect').textContent = String(state.correct);
 
     var frag = document.createDocumentFragment();
-    q.text.split(' ').forEach(function (p) {
-      if (p === '+' || p === '−' || p === '×' || p === '÷') frag.appendChild(el('span', 'op', p));
-      else frag.appendChild(document.createTextNode(p));
+    q.text.split(' ').forEach(function (part) {
+      if (part === '+' || part === '−' || part === '×' || part === '÷') frag.appendChild(el('span', 'op', part));
+      else frag.appendChild(document.createTextNode(part));
     });
     frag.appendChild(el('span', 'qmark', ' = ?'));
-    var boxNode = $('questionText');
-    boxNode.textContent = '';
-    boxNode.appendChild(frag);
+    var box = $('questionText');
+    box.textContent = '';
+    box.appendChild(frag);
 
     var wrap = $('options');
     wrap.textContent = '';
@@ -587,134 +818,214 @@
       btn.setAttribute('data-value', String(opt));
       btn.appendChild(el('kbd', '', String(i + 1)));
       btn.appendChild(document.createTextNode(String(opt)));
-      btn.addEventListener('click', function () { pickOption(opt, btn); });
+      btn.addEventListener('click', function () { pick(opt, btn); });
       wrap.appendChild(btn);
     });
 
     $('feedback').textContent = '';
     $('feedback').className = 'feedback';
+    pulse(box, 'enter');
     startTimer();
   }
 
-  function pickOption(value, btn) {
+  function pick(value, btn) {
     if (state.answered) return;
-    var leftMs = Math.max(0, state.deadline - performance.now());
-    settle(value === state.question.answer, value, leftMs, btn);
+    settle(value === state.question.answer, value, btn);
   }
 
   function handleTimeout() {
     if (state.answered) return;
-    settle(false, null, 0, null);
+    settle(false, null, null);
   }
 
-  function settle(isRight, chosen, leftMs, chosenBtn) {
+  function settle(isRight, chosen, chosenBtn) {
     state.answered = true;
     stopTimer();
     var q = state.question;
-    var info = levelInfo();
+    var info = levelInfo(state.level);
     state.total += 1;
 
     Array.prototype.forEach.call($('options').children, function (b) {
       b.disabled = true;
-      var v = Number(b.getAttribute('data-value'));
-      if (v === q.answer) b.classList.add('correct');
+      if (Number(b.getAttribute('data-value')) === q.answer) b.classList.add('correct');
       else if (chosenBtn && b === chosenBtn) b.classList.add('wrong');
       else b.classList.add('dim');
     });
 
     var fb = $('feedback');
-    fb.className = 'feedback';
-
     if (isRight) {
       state.score += info.value;
       state.correct += 1;
       state.streak += 1;
-      state.wrongStreak = 0;
       if (state.streak > state.maxStreak) state.maxStreak = state.streak;
       fb.className = 'feedback ok';
-      fb.textContent = '答对了 +' + info.value + ' 分' + (state.streak >= 2 ? ' · 连对 ' + state.streak : '');
-      floatScore('+' + info.value);
-      var combo = $('comboMeter');
-      combo.classList.remove('hot');
-      void combo.offsetWidth;
-      if (state.streak >= 2) combo.classList.add('hot');
+      fb.textContent = '答对 +' + info.value + ' 分' + (state.streak >= 2 ? ' · 连对 ' + state.streak : '');
     } else {
-      state.wrongStreak += 1;
+      state.wrong += 1;
       state.streak = 0;
+      var left = Math.max(0, info.limit - state.wrong);
       fb.className = 'feedback bad';
-      if (state.wrongStreak >= LIVES_TOTAL) {
-        fb.textContent = '连错 ' + LIVES_TOTAL + ' 次，生命耗尽 —— 正确答案是 ' + q.answer;
-      } else {
-        fb.textContent = (chosen === null ? '超时了' : '答错了') + '，正确答案是 ' + q.answer +
-          ' · 还剩 ' + (LIVES_TOTAL - state.wrongStreak) + ' 颗心';
-      }
-      state.wrong.push({ text: q.text, answer: q.answer, chosen: chosen, timeout: chosen === null });
+      fb.textContent = (chosen === null ? '超时了' : '答错了') + '，正确答案 ' + q.answer +
+        (left > 0 ? ' · 还能错 ' + left + ' 题' : ' · 额度用完');
+      state.wrongList.push({ text: q.text, answer: q.answer, chosen: chosen, timeout: chosen === null, steps: q.steps });
     }
 
     $('scoreVal').textContent = String(state.score);
     $('comboVal').textContent = String(state.streak);
-    paintLives();
+    paintQuota();
 
-    var dead = state.wrongStreak >= LIVES_TOTAL;
+    /* 轻量动效反馈：得分跳一下、连对放大、错误额度抖一下 */
+    if (isRight) {
+      pulse($('scoreVal'), 'score-pop');
+      if (state.streak >= 2) pulse($('comboVal'), 'combo-pop');
+      if (state.streak >= 2) pulse($('comboBox'), 'combo-pop');
+    } else {
+      pulse($('quotaBox'), 'shake');
+    }
+
+    var dead = state.wrong >= info.limit;
     setTimeout(function () {
-      if (dead) finishRound();
-      else renderQuestion();
-    }, isRight ? 560 : 880);
+      if (dead) {
+        if (state.revivesUsed < MAX_REVIVE) openRevive();
+        else finishRound();
+      } else {
+        renderQuestion();
+      }
+    }, isRight ? 560 : 950);
   }
 
-  function floatScore(text) {
-    var node = el('span', 'float-score', text);
-    $('scoreBox').appendChild(node);
-    setTimeout(function () { if (node.parentNode) node.parentNode.removeChild(node); }, 1000);
+  function pulse(node, cls) {
+    if (!node) return;
+    node.classList.remove(cls);
+    /* 强制回流，保证连续两次同样动效都能播放 */
+    void node.offsetWidth;
+    node.classList.add(cls);
+    setTimeout(function () { node.classList.remove(cls); }, 600);
   }
 
-  /* ---------------------------- 榜单：云端优先，本地兜底 ---------------------------- */
+  /* ============ 复活赛 ============ */
+  function reviveLeft() { return MAX_REVIVE - state.revivesUsed; }
+
+  function paintReviveTimer(leftMs) {
+    var sub = $('reviveSub');
+    sub.textContent = '额度用完了。答对下面这道知识点题，回 1 份额度继续答题（剩余 ' +
+      Math.max(0, Math.ceil(leftMs / 1000)) + ' 秒）';
+  }
+
+  function reviveTick() {
+    var left = state.reviveDeadline - performance.now();
+    paintReviveTimer(left);
+    if (left <= 0) { state.reviveRaf = 0; reviveTimeout(); return; }
+    state.reviveRaf = requestAnimationFrame(reviveTick);
+  }
+
+  function openRevive() {
+    var item = REVIVE_BANK[rand(0, REVIVE_BANK.length - 1)];
+    state.reviveAnswer = item.answer;
+    state.reviveAnswered = false;
+    state.reviveIndex = 0;
+
+    $('reviveCount').textContent = '剩余 ' + reviveLeft() + ' 次';
+    $('reviveFeedback').textContent = '';
+    $('reviveFeedback').className = 'feedback';
+
+    var qBox = $('reviveQuestion');
+    qBox.textContent = item.q;
+
+    var wrap = $('reviveOptions');
+    wrap.textContent = '';
+    shuffle(item.options.slice()).forEach(function (opt, i) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'opt';
+      btn.setAttribute('data-value', opt);
+      btn.appendChild(el('kbd', '', String(i + 1)));
+      btn.appendChild(document.createTextNode(opt));
+      btn.addEventListener('click', function () { revivePick(opt, btn); });
+      wrap.appendChild(btn);
+    });
+
+    $('giveUpBtn').hidden = false;
+    openModal('reviveModal');
+    state.reviveDeadline = performance.now() + REVIVE_SECONDS * 1000;
+    paintReviveTimer(REVIVE_SECONDS * 1000);
+    if (state.reviveRaf) cancelAnimationFrame(state.reviveRaf);
+    state.reviveRaf = requestAnimationFrame(reviveTick);
+  }
+
+  function stopReviveTimer() {
+    if (state.reviveRaf) cancelAnimationFrame(state.reviveRaf);
+    state.reviveRaf = 0;
+  }
+
+  function revivePick(value, btn) {
+    if (state.reviveAnswered) return;
+    state.reviveAnswered = true;
+    stopReviveTimer();
+
+    var right = value === state.reviveAnswer;
+    Array.prototype.forEach.call($('reviveOptions').children, function (b) {
+      b.disabled = true;
+      if (b.getAttribute('data-value') === state.reviveAnswer) b.classList.add('correct');
+      else if (b === btn) b.classList.add('wrong');
+      else b.classList.add('dim');
+    });
+
+    var fb = $('reviveFeedback');
+    if (right) {
+      state.revivesUsed += 1;
+      state.wrong = Math.max(0, levelInfo(state.level).limit - 1);
+      state.streak = 0;
+      paintQuota();
+      fb.className = 'feedback ok';
+      fb.textContent = '复活成功，回 1 份额度';
+      setTimeout(function () {
+        closeModal('reviveModal');
+        $('feedback').className = 'feedback ok';
+        $('feedback').textContent = '复活成功！还剩 1 份额度';
+        renderQuestion();
+      }, 900);
+    } else {
+      fb.className = 'feedback bad';
+      fb.textContent = '答错了，正确答案：' + state.reviveAnswer;
+      setTimeout(function () {
+        closeModal('reviveModal');
+        finishRound();
+      }, 1300);
+    }
+  }
+
+  function reviveTimeout() {
+    if (state.reviveAnswered) return;
+    state.reviveAnswered = true;
+    $('reviveFeedback').className = 'feedback bad';
+    $('reviveFeedback').textContent = '超时了，正确答案：' + state.reviveAnswer;
+    Array.prototype.forEach.call($('reviveOptions').children, function (b) {
+      b.disabled = true;
+      if (b.getAttribute('data-value') === state.reviveAnswer) b.classList.add('correct');
+      else b.classList.add('dim');
+    });
+    setTimeout(function () {
+      closeModal('reviveModal');
+      finishRound();
+    }, 1200);
+  }
+
+  /* ============ 榜单数据 ============ */
   function apiAvailable() { return location.protocol === 'http:' || location.protocol === 'https:'; }
 
-  function fetchTimeout(url, options, ms) {
+  function fetchJson(url, options, ms) {
     return new Promise(function (resolve, reject) {
       var timer = setTimeout(function () { reject(new Error('请求超时')); }, ms);
-      fetch(url, options || {}).then(function (res) { clearTimeout(timer); resolve(res); },
-        function (err) { clearTimeout(timer); reject(err); });
+      fetch(url, options || {}).then(function (res) {
+        clearTimeout(timer);
+        res.json().then(function (body) { resolve({ ok: res.ok, status: res.status, body: body }); },
+          function () { resolve({ ok: false, status: res.status, body: null }); });
+      }, function (err) { clearTimeout(timer); reject(err); });
     });
   }
 
-  function setMode(mode) {
-    MODE = mode;
-    var chip = $('modeChip');
-    if (chip) {
-      chip.textContent = mode === 'cloud' ? '云端榜单' : '本机榜单';
-      chip.className = 'mode-chip ' + (mode === 'cloud' ? 'cloud' : 'local');
-      chip.title = mode === 'cloud' ? '成绩保存在服务器，跨设备同步' : '成绩只存在本机浏览器';
-    }
-    ['homeRankScope', 'doneRankScope'].forEach(function (id) {
-      var node = $(id);
-      if (node) node.textContent = mode === 'cloud' ? '最高单局 · 跨设备同步' : '本机最高单局 · 换设备看不到';
-    });
-    var foot = $('footNote');
-    if (foot) {
-      foot.textContent = mode === 'cloud'
-        ? '成绩已同步到云端，任何人打开同一网址看到的都是这份榜单。'
-        : '成绩只保存在本台电脑的浏览器里，清缓存会一起清掉。';
-    }
-  }
-
-  function loadCloudRank() {
-    if (!apiAvailable()) return Promise.resolve(false);
-    return fetchTimeout('/api/rank', { headers: { accept: 'application/json' } }, 5000)
-      .then(function (res) {
-        if (!res.ok) return false;
-        return res.json().then(function (body) {
-          if (!body || !body.ok || !body.data || !Array.isArray(body.data.list)) return false;
-          CLOUD_LIST = body.data.list;
-          setMode('cloud');
-          return true;
-        });
-      })
-      .catch(function () { return false; });
-  }
-
-  function readLocalRounds() {
+  function readRounds() {
     try {
       var raw = localStorage.getItem(STORE_KEY);
       if (!raw) return [];
@@ -723,261 +1034,354 @@
     } catch (err) { return memoryRounds.slice(); }
   }
 
-  function writeLocalRounds(list) {
-    memoryRounds = list.slice(0, MAX_ROUNDS);
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(memoryRounds)); } catch (err) { /* 忽略 */ }
+  function writeRounds(list) {
+    memoryRounds = list.slice(-MAX_ROUNDS);
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(memoryRounds)); } catch (err) { /* 容量满则仅存内存 */ }
   }
 
-  function saveLocalRound() {
-    var rounds = readLocalRounds();
+  function saveRound() {
+    var rounds = readRounds();
     rounds.push({
-      name: state.name,
-      level: state.level,
-      score: state.score,
-      correct: state.correct,
-      total: state.total,
-      maxCombo: state.maxStreak,
-      time: new Date().toISOString().slice(0, 16).replace('T', ' ')
+      name: state.name, level: state.level, score: state.score, correct: state.correct,
+      total: state.total, maxCombo: state.maxStreak, ts: new Date().toISOString()
     });
     if (rounds.length > MAX_ROUNDS) rounds = rounds.slice(rounds.length - MAX_ROUNDS);
-    writeLocalRounds(rounds);
+    writeRounds(rounds);
   }
 
-  function aggregateLocal(rounds) {
+  function byRank(a, b) {
+    if (b.best !== a.best) return b.best - a.best;
+    if (b.rounds !== a.rounds) return b.rounds - a.rounds;
+    if (b.bestCombo !== a.bestCombo) return b.bestCombo - a.bestCombo;
+    return a.name.localeCompare(b.name, 'zh');
+  }
+
+  function aggregateLocal(level) {
     var map = {};
-    rounds.forEach(function (r) {
-      var key = String(r.name || '匿名选手');
-      if (!map[key]) map[key] = { name: key, score: 0, rounds: 0, bestCombo: 0, best: 0 };
-      map[key].score += Number(r.score) || 0;
+    readRounds().forEach(function (r) {
+      if (r.level !== level) return;
+      var key = String(r.name || '').trim();
+      if (!key) return;
+      if (!map[key]) map[key] = { name: key, score: 0, rounds: 0, best: 0, bestCombo: 0 };
+      var s = Number(r.score) || 0;
+      map[key].score += s;
       map[key].rounds += 1;
-      if ((Number(r.maxCombo) || 0) > map[key].bestCombo) map[key].bestCombo = Number(r.maxCombo) || 0;
-      if ((Number(r.score) || 0) > map[key].best) map[key].best = Number(r.score) || 0;
+      if (s > map[key].best) map[key].best = s;
+      var cb = Number(r.maxCombo) || 0;
+      if (cb > map[key].bestCombo) map[key].bestCombo = cb;
     });
-    return Object.keys(map).map(function (k) { return map[k]; }).sort(function (a, b) {
-      if (b.best !== a.best) return b.best - a.best;
-      if (b.rounds !== a.rounds) return b.rounds - a.rounds;
-      if (b.bestCombo !== a.bestCombo) return b.bestCombo - a.bestCombo;
-      return a.name.localeCompare(b.name, 'zh');
-    });
+    return Object.keys(map).map(function (k) { return map[k]; }).sort(byRank);
   }
 
-  function currentList() {
-    if (MODE === 'cloud' && CLOUD_LIST) return CLOUD_LIST;
-    return aggregateLocal(readLocalRounds());
+  function setMode(mode) {
+    MODE = mode;
+    var chip = $('modeChip');
+    chip.textContent = mode === 'cloud' ? '云端榜' : '本机榜';
+    chip.className = 'mode-chip' + (mode === 'cloud' ? ' cloud' : '');
+    chip.title = mode === 'cloud' ? '成绩上传服务器，跨设备同步' : '成绩只存在这台电脑的浏览器';
+  }
+
+  function loadCloudRank(level) {
+    if (!apiAvailable()) return Promise.resolve(null);
+    return fetchJson('/api/rank?level=' + encodeURIComponent(level), { headers: { accept: 'application/json' } }, 6000)
+      .then(function (r) {
+        if (!r.ok || !r.body || !r.body.ok || !Array.isArray(r.body.data.list)) return null;
+        CLOUD[level] = r.body.data.list;
+        setMode('cloud');
+        return r.body.data.list;
+      })
+      .catch(function () { return null; });
   }
 
   function submitRound() {
-    var payload = {
-      name: state.name,
-      level: state.level,
-      score: state.score,
-      correct: state.correct,
-      total: state.total,
-      maxCombo: state.maxStreak
-    };
-
     if (MODE !== 'cloud') {
-      saveLocalRound();
+      saveRound();
       return Promise.resolve({ saved: 'local', rank: 0 });
     }
-
-    return fetchTimeout('/api/score', {
+    return fetchJson('/api/score', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(payload)
-    }, 7000).then(function (res) {
-      return res.json().then(function (body) {
-        if (!res.ok || !body.ok) throw new Error((body && body.error) || '云端保存失败');
-        CLOUD_LIST = body.data.list;
-        return { saved: 'cloud', rank: body.data.rank || 0 };
-      });
+      body: JSON.stringify({
+        name: state.name, level: state.level, score: state.score,
+        correct: state.correct, total: state.total, maxCombo: state.maxStreak
+      })
+    }, 8000).then(function (r) {
+      if (!r.ok || !r.body || !r.body.ok) throw new Error((r.body && r.body.error) || '云端保存失败');
+      CLOUD[state.level] = r.body.data.list;
+      return { saved: 'cloud', rank: r.body.data.rank || 0 };
     }).catch(function (err) {
-      saveLocalRound();
-      return { saved: 'local', rank: 0, error: String(err && err.message ? err.message : err) };
+      saveRound();
+      return { saved: 'local', rank: 0, error: String((err && err.message) || err) };
     });
   }
 
-  function renderRank(target, highlight, limit) {
-    var list = currentList();
+  /* ============ 排行榜渲染 ============ */
+  function paintTabs(level) {
+    Array.prototype.forEach.call($('rankTabs').children, function (tab) {
+      tab.setAttribute('aria-pressed', tab.getAttribute('data-level') === level ? 'true' : 'false');
+    });
+  }
+
+  function renderRank(level) {
+    rankTab = level;
+    paintTabs(level);
+    var target = $('rankList');
+    var list = MODE === 'cloud' ? CLOUD[level] : aggregateLocal(level);
     target.textContent = '';
-    if (!list.length) {
-      target.appendChild(el('li', 'empty-note',
-        MODE === 'cloud' ? '云端还没有成绩，第一条纪录等你来写。' : '还没有成绩。第一条纪录等你来写。'));
-      return 0;
+
+    if (MODE === 'cloud' && !list) {
+      target.appendChild(el('li', 'empty', '正在从云端取这份榜单…'));
+      loadCloudRank(level).then(function (data) {
+        if (rankTab !== level) return;
+        if (data) { renderRank(level); return; }
+        setMode('local');
+        target.textContent = '';
+        target.appendChild(el('li', 'empty', '云端没响应，先看本机记录。'));
+      });
+      return;
     }
-    var top = list.slice(0, limit || 8);
-    var myPos = 0;
-    if (highlight) {
-      list.forEach(function (item, i) { if (item.name === highlight) myPos = i + 1; });
+
+    var info = levelInfo(level);
+    $('rankSub').textContent = info.name + '档 · 每题 ' + info.value + ' 分 · 每人取最好的一局';
+
+    if (!list || !list.length) {
+      target.appendChild(el('li', 'empty', '这个难度还没有成绩，第一个纪录等你来写。'));
+      return;
     }
-    top.forEach(function (item, i) {
-      var li = el('li', 'rank-item' + (item.name === highlight ? ' me' : ''));
-      li.appendChild(el('span', 'rank-no', String(i + 1)));
-      var nameWrap = el('span', 'rank-name', item.name);
-      if (item.rounds > 1) nameWrap.appendChild(el('i', '', item.rounds + ' 局'));
-      li.appendChild(nameWrap);
-      li.appendChild(el('span', 'rank-score', (item.best || 0).toLocaleString('zh-CN')));
-      li.appendChild(el('span', 'rank-unit', '分'));
+
+    list.slice(0, 20).forEach(function (item, i) {
+      var li = el('li', item.name === state.name ? 'me' : '');
+      li.appendChild(el('span', 'no', String(i + 1)));
+      var nm = el('span', 'nm', item.name);
+      if (Number(item.rounds) > 1) nm.appendChild(el('i', '', item.rounds + ' 局'));
+      li.appendChild(nm);
+      var sc = el('span', 'sc', Number(item.best || 0).toLocaleString('zh-CN'));
+      sc.appendChild(el('small', '', '分'));
+      li.appendChild(sc);
       target.appendChild(li);
     });
-    return myPos;
   }
 
-  /* ---------------------------- 收尾 ---------------------------- */
+  function openRank(level) {
+    openModal('rankModal');
+    renderRank(level || state.level);
+  }
+
+  /* ============ 结算 ============ */
   function finishRound() {
     stopTimer();
-    var alive = state.startTs ? Math.round((Date.now() - state.startTs) / 1000) : 0;
+    stopReviveTimer();
+    $('reviveModal').hidden = true;
+    var elapsed = state.startTs ? Math.round((Date.now() - state.startTs) / 1000) : 0;
 
     $('finalScore').textContent = state.score.toLocaleString('zh-CN');
     $('finalCorrect').textContent = String(state.correct);
     $('finalTotal').textContent = String(state.total);
     $('finalCombo').textContent = String(state.maxStreak);
-    $('finalTime').textContent = alive < 60 ? alive + 's' : Math.floor(alive / 60) + 'm' + (alive % 60) + 's';
-    $('myRankBadge').textContent = '正在上传成绩…';
+    $('finalTime').textContent = elapsed < 60 ? elapsed + 's' : Math.floor(elapsed / 60) + 'm' + (elapsed % 60) + 's';
+    $('myRankBadge').textContent = '正在上传…';
 
-    var wrongCard = $('wrongCard');
-    var wrongList = $('wrongList');
-    wrongList.textContent = '';
-    if (state.wrong.length) {
-      wrongCard.hidden = false;
-      state.wrong.forEach(function (w) {
-        var li = el('li', 'wrong-item');
-        var left = el('div');
-        left.appendChild(el('div', 'q', w.text + ' = ' + w.answer));
-        left.appendChild(el('div', 'a', w.timeout ? '超时未作答' : '你选了 ' + w.chosen));
-        li.appendChild(left);
-        if (w.timeout) li.appendChild(el('span', 'tag', '超时'));
-        wrongList.appendChild(li);
-      });
-    } else {
-      wrongCard.hidden = true;
-    }
+    var listBox = $('wrongList');
+    listBox.textContent = '';
+    $('wrongCount').textContent = state.wrongList.length + ' 题';
+    $('wrongEmpty').hidden = state.wrongList.length > 0;
 
-    showScreen('screen-done');
+    state.wrongList.forEach(function (w) {
+      var li = el('li', 'wrong-item');
+      var line1 = el('div', 'line1');
+      line1.appendChild(el('span', 'q', w.text + ' = ?'));
+      line1.appendChild(el('span', 'ans', '答案 ' + w.answer));
+      li.appendChild(line1);
+      li.appendChild(el('div', 'you', w.timeout ? '超时未作答' : '你选了 ' + w.chosen));
+      var steps = el('div', 'steps');
+      steps.appendChild(el('b', '', '怎么算：'));
+      steps.appendChild(document.createTextNode(w.steps));
+      li.appendChild(steps);
+      listBox.appendChild(li);
+    });
+
+    showPlay();
+    openModal('resultModal');
 
     submitRound().then(function (result) {
       var badge = $('myRankBadge');
-      var rankNo = result.saved === 'cloud' && result.rank > 0 ? result.rank : renderRank($('doneRank'), state.name, 8);
       if (result.saved === 'cloud') {
-        if (rankNo === 1) badge.textContent = '最高单局第 1 名 · 榜首';
-        else if (rankNo > 0) badge.textContent = '云端最高单局第 ' + rankNo + ' 名';
+        if (result.rank === 1) badge.textContent = levelInfo(state.level).name + '档第 1 名 · 榜首';
+        else if (result.rank > 0) badge.textContent = levelInfo(state.level).name + '档第 ' + result.rank + ' 名';
         else badge.textContent = '已上传，暂未进前 20';
       } else {
-        badge.textContent = result.error
-          ? '云端保存失败，已存本机（' + result.error + '）'
-          : '本机模式：成绩只存在这台电脑';
+        badge.textContent = result.error ? '云端保存失败，已记在本机' : '本机模式：成绩只存在这台电脑';
       }
-      renderRank($('doneRank'), state.name, 8);
-      renderRank($('homeRank'), state.name, 8);
+      if (MODE === 'cloud') renderRank(state.level);
     });
   }
 
+  /* ============ 开局 ============ */
   function beginRound() {
     var input = $('nameInput');
-    var name = input.value.trim().slice(0, 12) || '匿名选手';
-    input.value = name;
-    state.name = name;
+    var name = input.value.replace(/\s+/g, ' ').trim();
+    if (!name) {
+      input.className = 'bad';
+      $('nameHint').className = 'field-hint err';
+      $('nameHint').textContent = '先取个名字才能上榜（1–12 个字）';
+      input.focus();
+      return;
+    }
+    input.className = '';
+    $('nameHint').className = 'field-hint';
+    $('nameHint').textContent = '1–12 个字，不能只填空格';
+
+    state.name = name.slice(0, 12);
+    input.value = state.name;
+    try { localStorage.setItem(NAME_KEY, state.name); } catch (err) { /* 忽略 */ }
 
     state.index = 0;
     state.score = 0;
     state.correct = 0;
     state.total = 0;
+    state.wrong = 0;
     state.streak = 0;
     state.maxStreak = 0;
-    state.wrongStreak = 0;
-    state.wrong = [];
+    state.wrongList = [];
     state.answered = false;
     state.question = null;
+    state.revivesUsed = 0;
+    state.reviveAnswer = null;
+    state.reviveAnswered = false;
+    stopReviveTimer();
     state.startTs = Date.now();
-    state.duration = levelInfo().seconds;
+    state.duration = levelInfo(state.level).seconds;
 
     $('scoreVal').textContent = '0';
     $('comboVal').textContent = '0';
+    $('qCorrect').textContent = '0';
     buildPips();
-    paintLives();
+    paintQuota();
     paintTimer(state.duration * 1000);
-
-    showScreen('screen-play');
+    closeAll();
+    showPlay();
     renderQuestion();
   }
 
-  /* ---------------------------- 事件 ---------------------------- */
-  function syncRuleChip() {
-    var info = levelInfo();
-    $('ruleChip').innerHTML = '每题 <strong>' + info.seconds + '</strong> 秒 · ' + info.value + ' 分';
-    $('timeLeft').textContent = String(info.seconds);
-  }
-
+  /* ============ 事件 ============ */
   $('levelGroup').addEventListener('click', function (event) {
     var btn = event.target.closest('.level-btn');
     if (!btn) return;
     state.level = btn.getAttribute('data-level');
-    state.duration = levelInfo().seconds;
-    Array.prototype.forEach.call(this.querySelectorAll('.level-btn'), function (b) {
-      b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
-    });
-    syncRuleChip();
+    state.duration = levelInfo(state.level).seconds;
+    var all = this.querySelectorAll('.level-btn');
+    for (var i = 0; i < all.length; i += 1) all[i].setAttribute('aria-pressed', all[i] === btn ? 'true' : 'false');
+    syncHeadMeta();
+    if ($('rankModal').hidden === false) renderRank(state.level);
   });
 
   $('startBtn').addEventListener('click', beginRound);
-  $('againBtn').addEventListener('click', beginRound);
-  $('homeBtn').addEventListener('click', function () {
-    renderRank($('homeRank'), state.name, 8);
-    showScreen('screen-home');
-  });
-
-  $('quitBtn').addEventListener('click', function () {
-    var leftMs = state.answered ? 0 : Math.max(0, state.deadline - performance.now());
-    stopTimer();
-    if (!window.confirm('退出这一轮？当前成绩不会计入排行榜。')) {
-      if (!state.answered) {
-        state.deadline = performance.now() + Math.max(400, leftMs);
-        state.raf = requestAnimationFrame(tick);
-      }
-      return;
-    }
-    renderRank($('homeRank'), state.name, 8);
-    showScreen('screen-home');
-  });
-
   $('nameInput').addEventListener('keydown', function (event) {
     if (event.key === 'Enter') { event.preventDefault(); beginRound(); }
   });
-
-  document.addEventListener('keydown', function (event) {
-    if ($('screen-play').hidden || state.answered) return;
-    var map = { '1': 0, '2': 1, '3': 2, '4': 3, a: 0, b: 1, c: 2, d: 3 };
-    var key = event.key.toLowerCase();
-    if (!(key in map)) return;
-    event.preventDefault();
-    var btn = $('options').children[map[key]];
-    if (btn) btn.click();
+  $('nameInput').addEventListener('input', function () {
+    if (this.value.trim()) {
+      this.className = '';
+      $('nameHint').className = 'field-hint';
+      $('nameHint').textContent = '1–12 个字，不能只填空格';
+    }
   });
 
-  /* ---------------------------- 初始化 ---------------------------- */
+  $('quitBtn').addEventListener('click', function () {
+    var wasRunning = !state.answered && !$('viewPlay').hidden;
+    if (wasRunning) stopTimer();
+    if (!window.confirm('退出这一轮？当前成绩不会计入排行榜。')) {
+      if (wasRunning) startTimer();
+      return;
+    }
+    state.answered = true;
+    closeAll();
+    showStart();
+  });
+
+  $('rankBtn').addEventListener('click', function () { openRank(state.level); });
+  $('resultRankBtn').addEventListener('click', function () { closeModal('resultModal'); openRank(state.level); });
+  $('helpBtn').addEventListener('click', function () { openModal('helpModal'); });
+  $('againBtn').addEventListener('click', function () { closeAll(); beginRound(); });
+  $('giveUpBtn').addEventListener('click', function () {
+    state.reviveAnswered = true;
+    stopReviveTimer();
+    closeModal('reviveModal');
+    finishRound();
+  });
+
+  $('rankTabs').addEventListener('click', function (event) {
+    var tab = event.target.closest('.tab');
+    if (!tab) return;
+    renderRank(tab.getAttribute('data-level'));
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-close]'), function (btn) {
+    btn.addEventListener('click', function () {
+      var modal = btn.closest('.modal');
+      if (modal) modal.hidden = true;
+    });
+  });
+
+  ['rankModal', 'resultModal', 'helpModal'].forEach(function (id) {
+    $(id).addEventListener('click', function (event) {
+      if (event.target === this) this.hidden = true;
+    });
+  });
+
+  document.addEventListener('keydown', function (event) {
+    var map = { '1': 0, '2': 1, '3': 2, '4': 3, a: 0, b: 1, c: 2, d: 3 };
+    var key = String(event.key).toLowerCase();
+
+    /* 复活赛优先接管键盘，且不允许 Esc 关掉 */
+    if (!$('reviveModal').hidden) {
+      if (!state.reviveAnswered && Object.prototype.hasOwnProperty.call(map, key)) {
+        event.preventDefault();
+        var rBtn = $('reviveOptions').children[map[key]];
+        if (rBtn) rBtn.click();
+      }
+      if (event.key === 'Escape') event.preventDefault();
+      return;
+    }
+
+    var playing = !$('viewPlay').hidden && $('rankModal').hidden && $('resultModal').hidden && $('helpModal').hidden;
+    if (playing && !state.answered && Object.prototype.hasOwnProperty.call(map, key)) {
+      event.preventDefault();
+      var btn = $('options').children[map[key]];
+      if (btn) btn.click();
+      return;
+    }
+    if (event.key === 'Escape') closeAll();
+  });
+
+  /* ============ 初始化 ============ */
   (function init() {
-    var bar = $('ringBar');
-    bar.style.strokeDasharray = String(RING_LEN);
-    bar.style.strokeDashoffset = '0';
-    buildPips();
-    paintLives();
-    syncRuleChip();
+    $('ringBar').setAttribute('stroke-dasharray', String(RING_LEN));
+    $('ringBar').setAttribute('stroke-dashoffset', '0');
 
     var last = '';
-    try { last = localStorage.getItem('math20_name') || ''; } catch (err) { last = ''; }
-    if (last) $('nameInput').value = last;
-    $('nameInput').addEventListener('change', function () {
-      try { localStorage.setItem('math20_name', this.value.trim()); } catch (err) { /* 忽略 */ }
-    });
+    try { last = localStorage.getItem(NAME_KEY) || ''; } catch (err) { last = ''; }
+    /* 旧版默认昵称「匿名选手」不算数，留空逼玩家自己取名 */
+    if (last && last !== '匿名选手') { $('nameInput').value = last; state.name = last; }
+    else { try { localStorage.removeItem(NAME_KEY); } catch (err) { /* 忽略 */ } }
 
     setMode('local');
-    renderRank($('homeRank'), '', 8);
+    buildPips();
+    paintQuota();
+    syncHeadMeta();
+    showStart();
 
-    loadCloudRank().then(function (cloud) {
-      setMode(cloud ? 'cloud' : 'local');
-      renderRank($('homeRank'), '', 8);
-      if (!cloud) $('modeChip').title = '没能连上云端接口，成绩先存本机';
+    /* 从首页带 ?rank=1 或 #rank 进来时，直接弹排行榜 */
+    if ((location.hash + location.search).toLowerCase().indexOf('rank') > -1) {
+      setTimeout(function () { openRank(state.level); }, 150);
+    }
+
+    loadCloudRank('junior').then(function (data) {
+      if (!data) setMode('local');
+      if (!$('rankModal').hidden) renderRank(rankTab);
     });
+  
+
   })();
 })();
 </script>

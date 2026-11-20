@@ -3,10 +3,121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>20 秒心算挑战</title>
-<meta http-equiv="refresh" content="0; url=/math.html">
+<title>心算挑战 · 数学练习</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root{
+    --paper:#faf6ee; --paper-2:#f3ece0; --ink:#1b2230; --ink-2:#4c5566; --ink-3:#7c8494;
+    --accent:#e4572e; --teal:#27756a; --line:#e2d9c8;
+    --font-ui:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    --font-num:Georgia,"Times New Roman",serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    min-height:100dvh;background:var(--paper);color:var(--ink);font-family:var(--font-ui);
+    display:flex;align-items:center;justify-content:center;padding:24px 16px;
+    background-image:radial-gradient(rgba(27,34,48,.055) 1px,transparent 1px);
+    background-size:18px 18px;
+  }
+  .card{
+    width:100%;max-width:560px;background:#fffdf8;border:1px solid var(--line);border-radius:16px;
+    padding:clamp(22px,5vw,38px);box-shadow:0 18px 40px -28px rgba(27,34,48,.4);
+  }
+  .badge{
+    display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--teal);
+    background:rgba(39,117,106,.1);border-radius:999px;padding:4px 10px;letter-spacing:.3px;
+  }
+  .badge svg{width:13px;height:13px;flex:0 0 auto}
+  h1{
+    margin:16px 0 6px;font-size:clamp(30px,8vw,44px);line-height:1.15;letter-spacing:-.5px;
+    font-weight:800;
+  }
+  h1 em{font-style:normal;color:var(--accent);font-family:var(--font-num)}
+  .lead{margin:0 0 18px;font-size:clamp(14px,3.4vw,16px);line-height:1.7;color:var(--ink-2)}
+  .lead b{color:var(--ink);font-weight:700}
+  .facts{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:0 0 22px;
+  }
+  .facts div{
+    border:1px solid var(--line);border-radius:10px;background:var(--paper-2);padding:9px 11px;
+  }
+  .facts dt{font-size:11px;color:var(--ink-3);letter-spacing:.4px;margin:0 0 2px}
+  .facts dd{margin:0;font-size:13.5px;font-weight:600;color:var(--ink)}
+  .facts dd small{font-weight:400;color:var(--ink-3);font-size:11px}
+  .actions{display:flex;flex-direction:column;gap:10px}
+  .btn{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    width:100%;min-height:50px;border-radius:11px;border:1px solid transparent;
+    font-family:var(--font-ui);font-size:15.5px;font-weight:700;letter-spacing:.4px;
+    text-decoration:none;cursor:pointer;transition:transform .12s,background .15s,border-color .15s;
+  }
+  .btn:active{transform:scale(.985)}
+  .btn-primary{background:var(--accent);color:#fff8ee;box-shadow:0 10px 22px -14px rgba(228,87,46,.9)}
+  .btn-primary:hover{background:#d34a24}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+  .btn-ghost:hover{background:var(--paper-2);border-color:#cfc3ad}
+  .btn svg{width:16px;height:16px}
+  .foot{
+    margin:20px 0 0;padding-top:14px;border-top:1px dashed var(--line);
+    display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:space-between;
+    font-size:11.5px;color:var(--ink-3);
+  }
+  .foot a{color:var(--ink-3);text-decoration:none;border-bottom:1px solid rgba(124,132,148,.45)}
+  @media (min-width:640px){
+    .actions{flex-direction:row}
+    .btn{flex:1}
+    .facts{grid-template-columns:repeat(4,1fr)}
+  }
+</style>
 </head>
-<body style="margin:0;font-family:'Segoe UI','Microsoft YaHei',sans-serif;background:#faf6ee;color:#1b2230">
-<p style="padding:32px 20px;font-size:14px">正在进入挑战…… 如果没自动跳转，<a href="/math.html" style="color:#e4572e">点这里</a>。</p>
+<body>
+  <main class="card">
+    <span class="badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19V9M10 19V4M16 19v-7M22 19h-2"/></svg>
+      跨设备排行榜 · 免登录<sup>*</sup>
+    </span>
+
+    <h1>一道 <em>250</em> 分<sup>**</sup>，<br>你能撑几题？</h1>
+
+    <p class="lead">
+      不限题数的心算练习：小学 10 秒、初中 25 秒、高中 35 秒、大学 60 秒，每题固定 250 分按难度折算。
+      答错或超时会扣掉一份<b>错题额度</b>，额度用完即本轮结束；额度归零时还有一道<b>复活赛</b>公式题，答对能回 1 份额度。
+      结算会逐题列出错题的解答步骤，成绩按难度分别进榜。
+    </p>
+
+    <dl class="facts">
+      <div><dt>难度分档</dt><dd>四档 <small><br>容错 8 / 6 / 5 / 4</small></dd></div>
+      <div><dt>每题分值</dt><dd>200–425 <small><br>250 分基准</small></dd></div>
+      <div><dt>复活赛</dt><dd>2 次 <small><br>20 秒 / 次</small></dd></div>
+      <div><dt>排行口径</dt><dd>最好单局 <small><br>同难度内</small></dd></div>
+    </dl>
+
+    <div class="actions">
+      <a class="btn btn-primary" href="math.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 3l14 9-14 9z"/></svg>
+        开始挑战
+      </a>
+      <a class="btn btn-ghost" href="math.html?rank=1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 21h8M12 17v4M6 4h12v5a6 6 0 0 1-12 0z"/></svg>
+        查看排行榜
+      </a>
+      <a class="btn btn-ghost" href="https://ybq-mathgame.pages.dev/math">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 21h8M12 17v4M6 4h12v5a6 6 0 0 1-12 0z"/></svg>
+        前往网站
+      </a>
+    </div>
+
+    <p class="foot">
+      <span>© 新力 | 杨博骞 · v2.0.0 · 2026-11-19</span>
+      <a href="math.html">进入练习页</a>
+      <br>
+      <span>本项目开源于 <a href="https://github.com/hjh-7891/-website" target="_blank">GitHub</a>，欢迎提交问题或建议。</span><br>
+      * 须登入数据库，且登记名字<br>
+      ** 250 分为基准分，按难度折算，最高可达 425 分
+    </p>
+  </main>
 </body>
 </html>
